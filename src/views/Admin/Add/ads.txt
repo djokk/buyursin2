@@ -1,0 +1,8 @@
+count: 700
+group: 1
+id: 2
+itemStorage: "Магазин"
+itemUnit: "см"
+name: "Молния"
+storage: 3
+unit: 4

@@ -1,0 +1,72 @@
+import Vue from 'vue'
+import Vuei18n from 'vue-i18n'
+// import theJson from '@/static/settings.json'
+
+Vue.use(Vuei18n)
+
+
+export default new Vuei18n({
+  locale: ['uz', 'ru'],
+  fallbackLocale: localStorage.local,
+  messages: {
+    uz: {
+      local: 'uz',
+      entrance: 'Kirish',
+      telephone: 'Telefon nomer',
+      password: 'Parol',
+      btnEntrance: 'Tizimga kirish',
+      textLogout: 'Tizimdan chiqmoqchimisz ?',
+      yes: 'HA',
+      not: 'YOQ',
+      dashboard: 'Bosh sahifa',
+      add: 'Qoshish',
+      model: 'Model',
+      color: 'Rang',
+      kod: 'Kod',
+      name: 'Nomi',
+      typeBranch: 'Turi',
+      btnExit: 'CHIQISH',
+      textDelete: 'Haqiqatan ham oʻchirib tashlamoqchimisiz?',
+      kodColor: 'Rang kodi',
+      kodColorName: 'Rang nomi',
+      branches: 'Filial',
+      shop: "Do'kon",
+      store: 'Omborhona',
+      cancel: 'Bekor qilish',
+      change: "O'zgartirish",
+      pay: "Oylik",
+      matter: "Oylik",
+    },
+    ru: {
+      local: 'ru',
+      entrance: 'Вход',
+      telephone: 'Номер телефон',
+      password: 'Пароль',
+      btnEntrance: 'Вход в систему',
+      textLogout: 'Выйти ?',
+      yes: 'ДА',
+      not: 'НЕТ',
+      dashboard: 'Главная',
+      add: 'Добавить',
+      model: 'Модель',
+      color: 'Цвет',
+      kod: 'Код',
+      name: 'Название',
+      typeBranch: 'Тип',
+      btnExit: 'ВЫХОД',
+      textDelete: 'Вы уверенны что хотите удалить ?',
+      kodColor: 'Код цвета',
+      kodColorName: 'Название цвета',
+      branches: 'Филиал',
+      shop: 'Магазин',
+      store: 'Склад',
+      cancel: 'Отмена',
+      change: 'Изменить',
+      pay: 'Зар. плата.',
+      matter: 'Предмет',
+      superUser: 'Права админа',
+    },
+  },
+  silentFallbackWarn: true,
+  silentTranslationWarn: true
+})
