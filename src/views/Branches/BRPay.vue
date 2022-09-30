@@ -1,31 +1,75 @@
 <template>
-  <section class="pay">
+  <section class="brPay">
     <div class="breadcrumb p-0">
       <router-link :to="{name: 'Dashboard'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
-        <p>{{ $t('color') }}</p>
+        <p>{{ $t('Зарплата') }}</p>
       </div>
     </div>
     <div class="wrapper">
-      <div class="card-custom">
-        <div class="table-custom">
-          <div class="table-custom__header">
-            <p class="w-1">{{ $t('kod') }}</p>
-            <p class="w-2">{{ $t('name') }}</p>
-            <p class="w-3"></p>
-          </div>
-          <div class="table-custom__body">
-            <div class="table-custom__body-item">
-              <p class="w-1">{{ 1 }}</p>
-              <p class="w-2">adas</p>
-              <div class="w-3 btns">
-                <button @click="changeModalAdd(item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button>
-                <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+      <div class="card">
+        <ul class="clps-menu">
+          <li v-for="item in info" :key="item.employeId" class="clps-menu__item clps">
+            <div @click="collapseToggle(item.employeId)" class="clps__button">
+              <p class="d-flex align-items-center"><i class='ml-1 bx ' :class="[collapseActive == item.employeId ? 'bxs-down-arrow' : 'bxs-right-arrow']"></i> {{ item.employeName }}</p>
+              <div class="btns">
+                <!-- <button @click="changeModalAdd(1, item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button> -->
               </div>
             </div>
-          </div>
-        </div>
+            <Transition duration="350" name="nested">
+              <div v-if="collapseActive == item.employeId" class="clps__list list">
+                <div class="custom-table">
+                  <div v-if="item.works.length != 0" class="custom-table__header">
+                    <p class="w-1">№</p>
+                    <p class="w-2">{{ $t('Дата') }}</p>
+                    <p class="w-3">{{ $t('Наз. Работ.') }}</p>
+                    <p class="w-4">{{ $t('Количество') }}</p>
+                    <p class="w-5">{{ $t('Ст. за ед.') }}</p>
+                    <p class="w-6">{{ $t('ЗП') }}</p>
+                  </div>
+                  <div v-else class="custom-table__header">
+                    <p>Пусто</p>
+                  </div>
+                  <div v-for="(itemList,index) in item.works" :key="itemList.index" class="custom-table__body">
+                    <p class="w-1">{{ index + 1}}</p>
+                    <p class="w-2">{{ itemList.date }}</p>
+                    <p class="w-3">{{ itemList.work_name }}</p>
+                    <p class="w-4">{{ itemList.count }}</p>
+                    <p class="w-5">{{ itemList.pricePerOne }}</p>
+                    <p class="w-6">{{ itemList.price }}</p>
+                  </div>
+                  <div v-if="item.penalties.length != 0" class="custom-table__body-head">
+                    <p>Штрафы</p>
+                  </div>
+                  <div v-for="(itemPenalties,index) in item.penalties" :key="itemPenalties.index" class="custom-table__body">
+                    <p class="w-1">{{ index + 1}}</p>
+                    <p class="w-2">{{ itemPenalties.date }}</p>
+                    <p class="w-3">{{ itemPenalties.penaltyName }}</p>
+                    <p class="w-4"></p>
+                    <p class="w-5"></p>
+                    <p class="w-6">-{{ itemPenalties.price }}</p>
+                  </div>
+                  <div class="custom-table__body-total">
+                    <p>{{ $t('Общий ЗП') }}: </p>
+                    <p class="w-6">{{ item.to_paid }}</p>
+                  </div>
+                  <div class="custom-table__body-total">
+                    <p>{{ $t('Общий Штраф') }}: </p>
+                    <p class="w-6">-{{ item.to_subtract }}</p>
+                  </div>
+                  <div class="custom-table__body-total">
+                    <p>{{ $t('ИТОГО') }}: </p>
+                    <p class="w-6">{{ item.total_to_paid }}</p>
+                  </div>
+                  <div class="custom-table__body-total">
+                    <button @click="openModalDeleteGroup(item.employeId)" type="button" class="w-6 btn btn-success">{{ $t('Оплатить') }}</button>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </li>
+        </ul>
       </div>
     </div>
     <div @click="openModalAdd()" class="btn-add">
@@ -42,30 +86,91 @@
     </div>
     
     <div v-show="modalAdd || modalDelete" class="modal-bg"></div>
+    <Loading v-show="loading"/>
   </section>
 </template>
 
 <script>
+import axios from 'axios';
+import Loading from '@/components/Loading.vue';
+import { required } from 'vuelidate/lib/validators';
+
 export default {
-  name: 'Pay',
+  name: 'BRPay',
   data() {
     return {
       colorId: '',
+      loading: false,
       modalDelete: false,
-      modalAdd: false
+      modalAdd: false,
+      collapseActive: 0,
+      info: [],
+      api: '',
+      token: ''
     }
+  },
+  components: {
+    Loading
+  },
+  beforeMount() {
+    this.api = window.MY_CONFIG_BUYURSIN.api;
+  },
+  mounted() {
+    this.token = sessionStorage.getItem('token');
+    this.loading = true;
+    this.salary();
+    // this.getProductGroups();
   },
   methods: {    
     openModalDel(id) {
       this.colorId = id;
       this.modalDelete = true;
     },
+    salary() {
+      this.productTemplatesColorOption = [];
+      axios.get(`${this.api}/salary/`, {
+          headers: {
+            'Authorization': `Token ${this.token}`
+          }
+        })
+        .then(response => {
+          this.info = response.data;
+        })
+        .catch(e => console.log(e))
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    collapseToggle(id) {
+      if(this.collapseActive == id) {
+        this.collapseActive = 0
+      } else {
+        this.collapseActive = id;
+      }
+    },
+  },
+  validations: {
+    productGroupName: {
+      required
+    },
+    productTemplatesName: {
+      required
+    },
+    productGroupValue: {
+      required
+    },
+    productTemplatesCode: {
+      required
+    },
+    productTemplatesColorValue: {
+      required
+    },
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.pay {
+.brPay {
   @media screen and (max-width: 991.5px) {
     margin-left: 0;
     padding: 0px 10px;
@@ -100,105 +205,168 @@ export default {
       }
     }
   }
-  .card-custom {
-    // position: relative;
-    // display: flex;
-    // flex-direction: column;
-    // min-width: 0;
-    // word-wrap: break-word;
+  .card {
     background-color: #fff;
     background-clip: border-box;
     border: 0 solid transparent;
     border-radius: 0.25rem;
-    margin-bottom: 4.5rem;
     box-shadow: 0 0.3rem 0.8rem rgba(0,0,0,0.12);
     padding: 1rem;
     overflow: scroll hidden;
+    margin-bottom: 100px;
   }
-  .table-custom {
-    min-width: 500px;
-    // overflow: scroll hidden;
-    &__header {
-      display: flex;
-      // justify-content: space-between;
-      align-items: center;
-      // padding: 0 0.5rem 1rem 0.5rem;
-      p {
-        font-size: 20px !important;
-        font-weight: 600 !important;
-        text-align: center;
-        padding: 1rem;
-      }
-    }
-    &__body {
-      &-item {
+  .clps-menu {
+    min-width: 1000px;
+    .clps {
+      padding: 5px;
+      &__button {
         display: flex;
-        transition: 0.3s all ease-in-out;
-        min-height: 64px;
-        padding: 0 0.5rem 0 0;
-        &:hover {
-          background: rgba($color: #002f34, $alpha: 1) !important;
-          p {
-            color: #fff;
-          }
-        }
-        &:nth-child(odd) {
-          background: rgba($color: #002f34, $alpha: 0.12);
-        }
-        &:not(:last-child){
-          border-bottom: 1px solid rgba($color: #002f34, $alpha: 0.15);
-        }
-        p {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          // padding: 0.5rem 0.5rem;
-        }
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Roboto";
+        font-size: 20px;
+        font-weight: 400;
+        background: rgba($color: #002f34, $alpha: 0.3);
+        padding: 5px 20px;
+        cursor: pointer;
         .btns {
+          // width: 100px;
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          padding-left: 0.5rem;
           .btn {
-            display: block;
-            padding: 0.375rem 0.75rem;
+            display: flex;
+            align-items: center;
+            .bx {
+              margin-right: 5px;
+            }
           }
         }
-        .w-2 {
-          border-left: 1px solid rgba(255, 255, 255, 0.15);
-          border-right: 1px solid rgba(255, 255, 255, 0.15);
+        p {
+          font-family: "Roboto";
+          font-size: 20px;
+          font-weight: 400;
+          color: #002f34;
         }
-        .w-4 {
-          border-left: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .list {
+        // height: 0;
+        position: relative;
+        &::before {
+          content: "";
+          width: 3px;
+          height: 100%;
+          background: rgba($color: #002f34, $alpha: 0.85);
+          position: absolute;
+          top: 0;
+          left: 20px;
+          @media screen and (max-width: 991.5px) {
+            left: 10px;
+          }
+        }
+        .custom-table {
+          margin-left: 50px;
+          margin-right: 100px;
+          margin-bottom: 1px;
+          @media screen and (max-width: 991.5px) {
+            margin-left: 25px;
+            margin-right: 0px;
+          }
+          &__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 5px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            p {
+              font-weight: 600 !important;
+            }
+          }
+          &__body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(41, 115, 65, 0.1);
+            padding: 5px 15px;
+            position: relative;
+            margin-bottom: 2px;
+            transition: 0.3s all ease-in-out;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            &::before {
+              content: "";
+              width: 28px;
+              height: 3px;
+              background: rgba($color: #002f34, $alpha: 0.85);
+              position: absolute;
+              top: 50%;
+              left: -28px;
+              transform: translateY(-50%);
+              @media screen and (max-width: 991.5px) {
+                width: 15px;
+                top: 50%;
+                left: -15px;
+              }
+            }
+            &:hover {
+              background: rgba($color: #002f34, $alpha: 0.04);
+            }
+            &-head {
+              padding: 5px 15px;
+              p {
+                justify-content: flex-start !important;
+              }
+            }
+            &-total {
+              display: flex;
+              justify-content: flex-end;
+              align-items: flex-end;
+              padding: 5px 15px;
+              background: rgba($color: #002f34, $alpha: 0.2);
+              // .w-6 {
+              //   // justify-content: flex-end !important;
+              //   // align-items: flex-end !important;
+              //   // color: green;
+              //   width: 20% !important;
+              // }
+            }
+          }
+          p {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Roboto";
+            font-size: 18px;
+            font-weight: 400;
+            color: rgba($color: #002f34, $alpha: 0.85);
+          }
+          .btns {
+            display: flex;
+            justify-content: space-between;
+            .btn {
+              // display: flex;
+              padding: 0.2rem 0.5rem;
+            }
+          }
+          .w-1 {
+            width: 5%;
+          }
+          .w-2 {
+            width: 15%;
+          }
+          .w-3 {
+            width: 30%;
+          }
+          .w-4 {
+            width: 8%;
+          }
+          .w-5 {
+            width: 15%;
+          }
+          .w-6 {
+            width: 15%;
+          }
         }
       }
-    }
-    p {
-      font-family: 'Roboto';
-      font-size: 16px;
-      line-height: 16px;
-      font-weight: 400;
-      color: rgba($color: #002f34, $alpha: 0.85);
-      word-break: break-all;
-      white-space: pre-wrap;
-    }
-    .w-1 {
-      width: 50%;
-      @media screen and (max-width: 767.5px) {
-        width: 30%;
-      }
-    }
-    .w-2 {
-      width: 50%;
-      @media screen and (max-width: 575.5px) {
-        width: 50%;
-      }
-      @media screen and (max-width: 767.5px) {
-        width: 60%;
-      }
-    }
-    .w-3 {
-      width: 100px;
     }
   }
   .btn-add {

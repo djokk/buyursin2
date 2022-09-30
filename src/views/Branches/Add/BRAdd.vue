@@ -14,6 +14,11 @@
             {{ $t('employes') }}
           </router-link>
         </div>
+        <div class="col-xl-3">
+          <router-link :to="{name: 'BREmployes'}" class="card-custom">
+            {{ $t('Готовый продукт') }}
+          </router-link>
+        </div>
       </div>
     </div>
   </section>

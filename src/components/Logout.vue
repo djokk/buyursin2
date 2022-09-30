@@ -51,7 +51,8 @@ export default {
     background: #fff;
     border-radius: 0.25rem;
     padding: 12px;
-    z-index: 11;
+    // z-index: 11;
+    z-index: 98;
     h1 {
       font-family: 'Roboto';
       font-size: 24px;

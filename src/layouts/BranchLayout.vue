@@ -16,11 +16,11 @@
           <li class="menu__item" @click.prevent="isSidebarActiveItem(2)" :class="[isActiveItem == 2 ? 'active': '']">
             <router-link :to="{ name: 'BRPay'}" class="menu__link"><i class='bx bx-money'></i>{{ $t('pay') }}</router-link>
           </li>
-          <li class="menu__item" @click.prevent="isSidebarActiveItem(3)" :class="[isActiveItem == 3 ? 'active': '']">
+          <!-- <li class="menu__item" @click.prevent="isSidebarActiveItem(3)" :class="[isActiveItem == 3 ? 'active': '']">
             <router-link :to="{ name: 'Model'}" class="menu__link"><i class='bx bxs-t-shirt'></i>{{ $t('model') }}</router-link>
-          </li>
+          </li> -->
           <li class="menu__item" @click.prevent="isSidebarActiveItem(4)" :class="[isActiveItem == 4 ? 'active': '']">
-            <router-link :to="{ name: 'BRAdd'}" class="menu__link"><i class='bx bxs-t-shirt'></i>{{ $t('add') }}</router-link>
+            <router-link :to="{ name: 'BRAdd'}" class="menu__link"><i class='bx bxs-layer-plus'></i>{{ $t('add') }}</router-link>
           </li>
           <li class="menu__item">
             <button class="menu__btn" @click="removeLogout()">{{ $t('btnExit') }}</button>

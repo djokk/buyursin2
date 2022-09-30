@@ -94,7 +94,7 @@ export default {
       userId: '',
       password: '',
       userName: '',
-      superUser: '',
+      superUser: false,
       info: [],
       token: '',
       api: '',
@@ -240,7 +240,7 @@ export default {
     },
     delUser() {
       this.loading = true;
-      axios.delete(`${this.api}/deleteUser?id=${this.userId}`, {
+      axios.get(`${this.api}/deleteUser?id=${this.userId}`, {
           headers: {
             'Authorization': `Token ${this.token}`
           }

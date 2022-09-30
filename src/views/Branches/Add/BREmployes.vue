@@ -8,104 +8,119 @@
       </div>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
-        <p>{{ 'Предмет' }}</p>
+        <p>{{ 'employes' }}</p>
       </div>
     </div>
     <div class="wrapper">
       <div class="card">
         <ul class="clps-menu">
           <li v-for="item in info" :key="item.id" class="clps-menu__item clps">
-            <div @click="collapseToggle(item.id)" class="clps__button">
-              <p class="d-flex align-items-center">{{ item.name }} <i class='ml-1 bx ' :class="[collapseActive == item.id ? 'bxs-down-arrow' : 'bxs-right-arrow']"></i></p>
-              <div class="btns">
-                <button @click="changeModalAdd(1, item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button>
-                <button @click="openModalDelGroup(item.id)" type="button" class="btn btn-danger"><i class='bx bxs-trash'></i></button>
+            <div v-if="item.branchType == 1" class="clps__item">
+              <div @click="collapseToggle(1, item.id)" class="clps__button">
+                <p class="d-flex align-items-center">{{ item.name }} <i class='ml-1 bx ' :class="[collapseActive == item.id ? 'bxs-down-arrow' : 'bxs-right-arrow']"></i></p>
               </div>
+              <Transition duration="350" name="nested">
+              <div v-if="collapseActive == item.id" class="clps__list pt-2">
+                <ul v-if="item.list.length != 0" class="clps-menu-down">
+                  <li v-for="itemDown in item.list" :key="itemDown.id" class="clps-menu-down__item clps-down">
+                    <div @click="collapseToggle(2, itemDown.id)" class="clps-down__button">
+                      <p class="d-flex align-items-center">{{ itemDown.name }} <i class='ml-1 bx ' :class="[collapseDownActive == itemDown.id ? 'bxs-down-arrow' : 'bxs-right-arrow']"></i></p>
+                    </div>
+                    <Transition duration="350" name="nested">
+                    <div v-if="collapseDownActive == itemDown.id" class="clps-down__list list pt-2">
+                      <div class="custom-table-down">
+                        <div v-if="item.list.length != 0" class="custom-table-down__header">
+                          <p class="w-1">№</p>
+                          <p class="w-2">ФИО</p>
+                          <p class="w-3">Работа</p>
+                          <p class="w-4"></p>
+                        </div>
+                        <div v-else class="custom-table-down__header">
+                          <p>Пусто</p>
+                        </div>
+                        <div v-for="(itemDownItem,index) in itemDown.listItem" :key="itemDownItem.id" class="custom-table-down__body pt-2">
+                          <p class="w-1">{{ index + 1 }}</p>
+                          <p class="w-2">{{ itemDownItem.name }}</p>
+                          <p class="w-3">{{ itemDownItem.jobTitle }}</p>
+                          <div class="w-4 btns">
+                            <button @click="changeModalAdd(itemDownItem)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button>
+                            <button @click="openModalDel(itemDownItem.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    </Transition>
+                  </li>
+                </ul>
+                <div v-else-if="item.list.length == 0" class="clps-menu-down__header">
+                  <p>Пусто</p>
+                </div>
+              </div>
+              </Transition>
             </div>
-            <Transition duration="350" name="nested">
+            <div v-else class="clps__item">
+              <div @click="collapseToggle(1, item.id)" class="clps__button">
+                <p class="d-flex align-items-center">{{ item.name }} <i class='ml-1 bx ' :class="[collapseActive == item.id ? 'bxs-down-arrow' : 'bxs-right-arrow']"></i></p>
+              </div>
+              <Transition duration="350" name="nested">
               <div v-if="collapseActive == item.id" class="clps__list list">
                 <div class="custom-table">
                   <div v-if="item.list.length != 0" class="custom-table__header">
                     <p class="w-1">№</p>
                     <p class="w-2">Название</p>
-                    <p class="w-3">Количество</p>
+                    <p class="w-3">Работа</p>
                     <p class="w-4"></p>
                   </div>
-                  <div v-else class="custom-table__header">
+                  <div v-else-if="item.list.length == 0" class="custom-table__header">
                     <p>Пусто</p>
                   </div>
                   <div v-for="(itemList,index) in item.list" :key="itemList.Id" class="custom-table__body">
                     <p class="w-1">{{ index + 1}}</p>
                     <p class="w-2">{{ itemList.name }}</p>
-                    <p class="w-3">{{ itemList.count }} {{ itemList.itemUnit }}</p>
+                    <p class="w-3">{{ itemList.jobTitle }}</p>
                     <div class="btns w-4">
-                      <button @click="changeModalAdd(2, itemList)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button>
+                      <button @click="changeModalAdd(itemList)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button>
                       <button @click="openModalDel(itemList.id)" type="button" class="btn btn-danger"><i class='bx bxs-trash'></i></button>
                     </div>
                   </div>
                 </div>
               </div>
-            </Transition>
+              </Transition>
+            </div>
           </li>
         </ul>
       </div>
     </div>
-    <!-- <div class="container-fluid">
-    </div> -->
     <div @click="openModalAdd()" class="btn-add">
       <i class="fa fa-plus-circle" aria-hidden="true"></i>
     </div>
-    <div v-show="modalAdd" class="modal-add">
-      <div v-if="text" class="text">
-        <p @click="madalParams = 1" class="" :class="[madalParams == 1 ? 'active' : '']">Группа предмет</p>
-        <p @click="madalParams = 2" class="" :class="[madalParams == 2 ? 'active' : '']">Предмет</p>
-      </div>
-      <form v-if="madalParams == 1" class="form" action="">
+    <div v-if="modalAdd" class="modal-add">
+      <form class="form" action="">
         <div class="name">
-          <input v-model="metterGroupName" class="input" :class="$v.metterGroupName.$error ? 'input is-invalid': 'input'" type="text">
-          <span>Название группы предметы</span>
-        </div>
-        <div class="btns">
-          <button v-if="btnChange != true" @click.prevent="addMetterGroup()" class="btn btn-success">Добавить</button>
-          <button v-else-if="btnChange == true" @click.prevent="editMetterGroup()" class="btn btn-warning" type="button">Изменить</button>
-          <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">Отмена</button>
-        </div>
-      </form>
-      <form v-if="madalParams == 2" class="form" action="">
-        <div class="selects">
-          <multiselect v-model="metterGroupNameValue" :class="$v.metterGroupNameValue.$error ? 'is-invalid': ''" placeholder="" label="name" track-by="code" :options="metterGroupNameOption" :multiple="false" :taggable="false" :searchable="false"></multiselect>
-          <span>Группа</span>
+          <span>{{ $t('name') }}</span>
+          <input v-model="employesName" :class="$v.employesName.$error ? 'is-invalid': ''" class="input" type="text">
         </div>
         <div class="name">
-          <input v-model="metterName" class="input" :class="$v.metterName.$error ? 'input is-invalid': 'input'" type="text">
-          <span>Название</span>
-        </div>
-        <div class="name">
-          <input v-model="metterCount" class="input" :class="$v.metterCount.$error ? 'input is-invalid': 'input'" type="number">
-          <span>Количество</span>
+          <span>{{ $t('job') }}</span>
+          <input v-model="employesJobTitle" :class="$v.employesJobTitle.$error ? 'is-invalid': ''" class="input" type="text">
         </div>
         <div class="selects">
-          <multiselect v-model="metterUnitValue" :class="$v.metterUnitValue.$error ? 'is-invalid': ''" placeholder="" label="name" track-by="code" :options="metterUnitOption" :multiple="false" :taggable="false" :searchable="false"></multiselect>
-          <span>Единица измерения</span>
+          <span>{{ $t('branch') }}</span>
+          <multiselect v-model="branchValue" :class="$v.branchValue.$error ? 'is-invalid': ''" placeholder="" label="name" track-by="id" :options="branchOptions" :multiple="false" :taggable="false" :searchable="false"></multiselect>
+        </div>
+        <div v-if="department" class="selects">
+          <span>{{ $t('groups') }}</span>
+          <multiselect v-model="departmentValue" placeholder="" label="name" track-by="id" :options="departmentOptions" :multiple="false" :taggable="false" :searchable="false"></multiselect>
         </div>
         <div class="btns">
-          <button v-if="btnChange != true" @click.prevent="addMetter()" class="btn btn-success">Добавить</button>
-          <button v-else-if="btnChange == true" @click.prevent="editMetter()" class="btn btn-warning" type="button">Изменить</button>
-          <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">Отмена</button>
-        </div>
-      </form>
-    </div>
-    <div v-if="modalDeleteGroup" class="modal-delete">
-      <form @submit.prevent="delMetterGroup()" class="form" action="">
-        <p>Вы уверенны что хотите удалить ?</p>
-        <div class="btns">
-          <button class="btn btn-success" type="submit">ДА</button>
-          <button @click="modalDeleteGroup = !modalDeleteGroup" class="btn btn-outline-danger" type="button">НЕТ</button>
+          <button v-if="btnChange != true" @click.prevent="addEmployes()" class="btn btn-success" type="button">{{ $t('add') }}</button>
+          <button v-else-if="btnChange == true" @click.prevent="editEmployes()" class="btn btn-warning" type="button">{{ $t('change') }}</button>
+          <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">{{ $t('cancel') }}</button>
         </div>
       </form>
     </div>
     <div v-if="modalDelete" class="modal-delete">
-      <form @submit.prevent="deleteMetter()" class="form" action="">
+      <form @submit.prevent="delEmploye()" class="form" action="">
         <p>Вы уверенны что хотите удалить ?</p>
         <div class="btns">
           <button class="btn btn-success" type="submit">ДА</button>
@@ -113,7 +128,7 @@
         </div>
       </form>
     </div>
-    <div v-show="modalAdd || modalDelete || modalDeleteGroup" class="modal-bg"></div>
+    <div v-show="modalAdd || modalDelete" class="modal-bg"></div>
     <Loading v-show="loading"/>
   </div>
 </template>
@@ -124,42 +139,40 @@ import { required } from 'vuelidate/lib/validators';
 import Loading from '@/components/Loading.vue';
 
 export default {
-  name: 'BREmployes',
+  name: 'Employes',
   data() {
     return {
       loading: false,
-      metterGroup: [],
       info: [],
       collapseActive: 0,
+      collapseDownActive: 0,
       modalAdd: false,
       modalDelete: false,
-      modalDeleteGroup: false,
       madalParams: 1,
       btnChange: false,
       text: true,
-      branchId: 1,
-      metterGroupNameValue: null,
-      metterGroupNameOption: [],
-      metterGroupId: '',
-      metterGroupName: '',
-      metterId: '',
-      metterName: '',
-      metterCount: '',
-      metterUnitValue: null,
-      metterUnitOption: [
+      employesId: '',
+      employesName: '',
+      employesJobTitle: '',
+      branchValue: '',
+      branchOptions: [],
+      branchType: [
         {
           code: 1,
-          name: 'см'
+          name: 'Цех'
         },
         {
           code: 2,
-          name: 'шт'
+          name: this.$t('shop')
         },
         {
           code: 3,
-          name: 'гр'
-        },
+          name: this.$t('store')
+        }
       ],
+      department: false,
+      departmentValue: '',
+      departmentOptions: [],
       token: '',
       api: ''
     }
@@ -172,78 +185,170 @@ export default {
     // this.token = localStorage.token;
   },
   mounted() {
+    this.token = sessionStorage.getItem('token');
     this.loading = true;
-    this.getMetterGroups();
-    // this.getUsers();
+    this.getBranchesGroups();
   },
   methods: {
-    getMetterGroups() {
+    getBranchesGroups() {
       this.info = [];
-      this.metterGroupNameOption = [];
-      axios.get(`${this.api}/employes/?branch=${this.branchId}`, {
-          headers: {
-            'Authorization': `Token ${this.token}`
-          }
-        })
-        .then(response => {
-          console.log(response.data);
-          // this.userGroup = response.data;
-          // for(let i = 0; i < response.data.length; i++) {
-          //   const list = {
-          //     'id': response.data[i].id,
-          //     'name': response.data[i].name,
-          //     'list': []
-          //   }
-          //   this.info.push(list);
-          // }
-          // for (let index = 0; index < response.data.length; index++) {
-          //   const element = {
-          //     code: response.data[index].id,
-          //     name: response.data[index].name
-          //   }
-          //   this.metterGroupNameOption.push(element)
-          // }
-          // this.getMetter();
-        })
-        .catch(e => console.log(e))
-        .finally(() => { this.loading = false; });
-    },
-    getMetter() {
-      axios.get(`${this.api}/items/`, {
+      this.branchOptions = [];
+      axios.get(`${this.api}/branches/`, 
+        {
           headers: {
             'Authorization': `Token ${this.token}`
           }
         })
         .then(response => {
           // console.log(response.data);
-          for (let i = 0; i < this.info.length; i++) {
-            for(let t = 0; t < response.data.length; t++) {
-              if(this.info[i].id == response.data[t].group) {
-                this.info[i].list.push(response.data[t]);
-              }
-            }
+          // this.info = response.data;
+          for (let index = 0; index < response.data.length; index++) {
+            this.info.push({
+              id: response.data[index].id,
+              name: response.data[index].name,
+              branchType: response.data[index].branchType,
+              list: []
+            });
+            this.branchOptions.push(response.data[index]);
           }
+          this.getGropus();
         })
-        .catch(e => console.log(e));
+        .catch(error => {
+          // console.log(e.response);
+          if(error.response.status == 401) {
+            this.$toast.error(error.response.data.detail);
+            sessionStorage.setItem('token', '');
+            this.$router.push({ name: 'Auth' });
+          }
+        });
     },
-    collapseToggle(id) {
-      if(this.collapseActive == id) {
-        this.collapseActive = 0
-      } else {
-        this.collapseActive = id;
+    getGropus() {
+      this.departmentOptions = [];
+      for (let index = 0; index < this.info.length; index++) {
+        if(this.info[index].branchType == 1) {
+          axios.get(`${this.api}/departments/?branch=${this.info[index].id}`, 
+            {
+              headers: {
+                'Authorization': `Token ${this.token}`
+              }
+            })
+            .then(response => {
+              // console.log(response.data);
+              // const info = response.data;
+              if(response.data != []) {
+                for (let i = 0; i < response.data.length; i++) {
+                  this.info[index].list.push({
+                    id: response.data[i].id,
+                    branch: response.data[i].branch,
+                    name: response.data[i].name,
+                    listItem: []
+                  });
+                  this.departmentOptions.push(response.data[i]);
+                }
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              if(error.response.status == 401) {
+                this.$toast.error(error.response.data.detail);
+              }
+            });
+        } else {
+          // console.log('1');
+          axios.get(`${this.api}/employes/?branch=${this.info[index].id}`, 
+            {
+              headers: {
+                'Authorization': `Token ${this.token}`
+              }
+            })
+            .then(response => {
+              if(response.data != []) {
+                for (let i = 0; i < response.data.length; i++) {
+                  this.info[index].list.push(response.data[i]);
+                }
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              if(error.response.status == 401) {
+                this.$toast.error(error.response.data.detail);
+              }
+            });
+        }
+        if(index == this.info.length - 1) {
+          setTimeout(() => {
+            this.getDepartment();
+            
+          }, 3000);
+        }
       }
     },
-    addMetterGroup() {
+    getDepartment() {
+      for (let index = 0; index < this.info.length; index++) {
+        if(this.info[index].branchType == 1) {
+          for (let i = 0; i < this.info[index].list.length; i++) {
+            axios.get(`${this.api}/employes/?department=${this.info[index].list[i].id}`, 
+              {
+                headers: {
+                  'Authorization': `Token ${this.token}`
+                }
+              })
+              .then(response => {
+                // console.log(response.data);
+                // const info = response.data;
+                if(response.data != []) {
+                  for (let t = 0; t < response.data.length; t++) {
+                    // console.log('2');
+                    this.info[index].list[i].listItem.push(response.data[t]);
+                  }
+                }
+              })
+              .catch(error => {
+                console.log(error);
+                if(error.response.status == 401) {
+                  this.$toast.error(error.response.data.detail);
+                }
+              });
+          }
+        }
+      }
+      setTimeout(() => {
+        this.loading = false;
+      }, 3000);
+    },
+    collapseToggle(params, id) {
+      switch (params) {
+        case 1:
+          if(this.collapseActive == id) {
+            this.collapseActive = 0
+          } else {
+            this.collapseActive = id;
+          }
+          break;
+        case 2:
+          if(this.collapseDownActive == id) {
+            this.collapseDownActive = 0
+          } else {
+            this.collapseDownActive = id;
+          }
+          break;
+      }
+    },
+    addEmployes() {
       this.$v.$touch()
-      if (this.$v.metterGroupName.$invalid) {
+      if (this.$v.employesName.$invalid || this.$v.branchValue.$invalid) {
         this.$toast.open({
           message: 'Ввидите данные правильно',
           type: "error"
         })
       } else {
         this.loading = true;
-        axios.post(`${this.api}/itemgroups/`, {
-            "name": this.metterGroupName
+        axios.post(`${this.api}/employes/`, {
+            "name": this.employesName,
+            "jobTitle": this.employesJobTitle,
+            "branch": this.branchValue.id,
+            // "department": this.departmentValue == '' ? this.departmentValue.id : null
+            "department": this.departmentValue.id || null
           }, 
           {
             headers: {
@@ -253,29 +358,38 @@ export default {
           .then(response => {
             if(response.data.code == 1) {
               this.$toast.success('Добавленно');
-              this.getMetterGroups();
+              this.getBranchesGroups();
             } else {
               this.$toast.error(response.data.msg);
             }
           })
-          .catch(e => console.log(e))
+          .catch(error => {
+            console.log(error);
+            if(error.response.status == 401) {
+              this.$toast.error(error.response.data.detail);
+            }
+          })
           .finally(()=> {
             this.closeModalAdd();
             this.loading = false;
           });
       }
     },
-    editMetterGroup() {
+    editEmployes() {
       this.$v.$touch()
-      if (this.$v.metterGroupName.$invalid) {
+      if (this.$v.employesName.$invalid || this.$v.branchValue.$invalid) {
         this.$toast.open({
           message: 'Ввидите данные правильно',
           type: "error"
         })
       } else {
         this.loading = true;
-        axios.put(`${this.api}/itemgroups/${this.metterGroupId}/`, {
-            "name": this.metterGroupName
+        axios.put(`${this.api}/employes/${this.employesId}/`, {
+            "name": this.employesName,
+            "jobTitle": this.employesJobTitle,
+            "branch": this.branchValue.id,
+            "department": this.departmentValue.id || null
+            // "department": this.departmentValue == '' ? this.departmentValue.id : null
           }, 
           {
             headers: {
@@ -284,22 +398,28 @@ export default {
           })
           .then(response => {
             if(response.data.code == 1) {
-              this.$toast.success('Изменено');
-              this.getMetterGroups();
+              this.$toast.success('Изменнено');
+              this.getBranchesGroups();
             } else {
               this.$toast.error(response.data.msg);
             }
           })
-          .catch(e => console.log(e))
+          .catch(error => {
+            console.log(error);
+            if(error.response.status == 401) {
+              this.$toast.error(error.response.data.detail);
+            }
+          })
           .finally(()=> {
             this.closeModalAdd();
             this.loading = false;
           });
       }
     },
-    delMetterGroup() {
+    delEmploye() {
       this.loading = true;
-      axios.delete(`${this.api}/itemgroup-delete/${this.metterGroupId}/`, {
+      axios.delete(`${this.api}/employe-delete/${this.employesId}/`, 
+        {
           headers: {
             'Authorization': `Token ${this.token}`
           }
@@ -307,106 +427,24 @@ export default {
         .then(response => {
           if(response.data.code == 1) {
             this.$toast.success('Удаленно');
-            this.getMetterGroups();
+            this.getBranchesGroups();
           } else {
             this.$toast.error(response.data.msg);
           }
         })
-        .catch(e => console.log(e))
-        .finally(()=> {
-          this.closeModalAdd();
-          this.loading = false;
-        });
-    },
-    openModalDelGroup(id) {
-      console.log(id);
-      this.metterGroupId = id;
-      this.modalDeleteGroup = true;
-    },
-    addMetter() {
-      this.$v.$touch()
-      if (this.$v.metterName.$invalid || this.$v.metterUnitValue.$invalid || this.$v.metterCount.$invalid || this.$v.metterGroupNameValue.$invalid || this.$v.metterGroupNameValue.$invalid) {
-        this.$toast.open({
-          message: 'Ввидите данные правильно',
-          type: "error"
-        })
-      } else {
-        this.loading = true;
-        axios.post(`${this.api}/items/`, {
-          "name": this.metterName,
-          "unit": this.metterUnitValue.code,
-          "count": +this.metterCount,
-          "group": this.metterGroupNameValue.code,
-          "storage": 1
-        },
-        {
-          headers: {
-            'Authorization': `Token ${this.token}`
+        .catch(error => {
+          // console.log(e.response);
+          if(error.response.status == 401) {
+            this.$toast.error(error.response.data.detail);
           }
         })
-          .then(response => {
-            if(response.data.code == 0) {
-              this.$toast.success('Добавленно');
-              this.getMetterGroups();
-            } else {
-              this.$toast.error(response.data.msg);
-            }
-          })
-          .catch(e => console.log(e))
-          .finally(()=> {
-            this.closeModalAdd();
-            this.loading = false;
-          });
-      }
-    },
-    editMetter() {
-      this.$v.$touch()
-      if (this.$v.firstName.$invalid || this.$v.lastName.$invalid || this.$v.password.$invalid || this.$v.userName.$invalid || this.$v.userGroupNameValue.$invalid) {
-        this.$toast.open({
-          message: 'Ввидите данные правильно',
-          type: "error"
-        })
-      } else {
-        this.loading = true;
-        // axios.get(`${this.api}/EditUser?id=${this.userId}&username=${this.userName}&pass=${this.password}&usrGroupId=${this.userGroupNameValue.code}&FirstName=${this.firstName}&LastName=${this.lastName}&token=${this.token}`)
-        //   .then(response => {
-        //     if(response.data.code == 0) {
-        //       this.$toast.success('Изменено');
-        //       this.getMetterGroups();
-        //     } else {
-        //       this.$toast.error(response.data.msg);
-        //     }
-        //   })
-        //   .catch(e => console.log(e))
-        //   .finally(()=> {
-        //     this.closeModalAdd();
-        //     this.loading = false;
-        //   });
-      }
-    },
-    deleteMetter() {
-      this.loading = true;
-      axios.delete(`${this.api}/item/${this.metterId}/`, {
-          headers: {
-            'Authorization': `Token ${this.token}`
-          }
-        })
-        .then(response => {
-          if(response.data.code == 0) {
-            this.$toast.success('Удаленно');
-            this.getMetterGroups();
-          } else {
-            this.$toast.error(response.data.msg);
-          }
-        })
-        .catch(e => console.log(e))
         .finally(()=> {
           this.closeModalAdd();
           this.loading = false;
         });
     },
     openModalDel(id) {
-      this.metterId = id;
+      this.employesId = id;
       this.modalDelete = true;
     },
     openModalAdd() {
@@ -415,67 +453,76 @@ export default {
     closeModalAdd() {
       this.modalAdd = false;
       this.modalDelete = false;
-      this.modalDeleteGroup = false;
-      this.text = true;
       this.btnChange = false;
-      this.madalParams = 1;
-      this.metterGroupId = '';
-      this.metterGroupName = '';
-      this.metterId = '';
-      this.metterName = '';
-      this.password = '';
-      this.lastName = '';
-      this.firstName = '';
-      this.metterGroupNameValue = [];
+      this.employesId = '';
+      this.employesName = '';
+      this.branchValue = '';
+      this.employesJobTitle = '';
+      this.departmentValue = [];
+      this.department = false;
       this.$v.$reset();
     },
-    changeModalAdd(params, item) {
+    changeModalAdd(info) {
+      // console.log(item);
       this.modalAdd = true;
       this.btnChange = true;
       this.text = false;
-      if(params == 1) {
-        // console.log(item);
-        this.madalParams = 1;
-        this.metterGroupId = item.id;
-        this.metterGroupName = item.name;
-      } else {
-        console.log(item);
-        this.madalParams = 2;
-        this.metterGroupNameValue = this.metterGroupNameOption.find(items => {
-          if(items.code == item.group) {
-            return item
-          }
-        })
-        this.metterId = item.id;
-        this.metterName = item.name;
-        this.metterCount = item.count;
-        this.metterUnitValue = this.metterUnitOption.find(items => {
-          if(items.code == item.unit) {
-            return item
-          }
-        })
-        // this.lastName = lastName;
-        // this.firstName = firstName;
-      }
+      this.employesId = info.id;
+      this.employesName = info.name;
+      this.employesJobTitle = info.jobTitle;
+      this.branchValue = this.branchOptions.find(items => {
+        if(items.id == info.branch) {
+          return items
+        }
+      });
+      // console.log(this.branchValue);
+      const departmentInfo = this.departmentOptions.find(items => {
+        if(items.id == info.department) {
+          return items
+        }
+      });
+      console.log(departmentInfo);
+      // for (let index = 0; index < array.length; index++) {
+      //   const element = array[index];
+        
+      // }
+      // const info = this.info.find(items => {
+      //   if(items.id == item.department) {
+      //     return items
+      //   }
+      // });
+      // console.log(info);
+      this.departmentValue = departmentInfo;
     },
+  },
+  watch: {
+    branchValue() {
+      setTimeout(() => {
+        if(this.branchValue.branchType == 1) {
+          // const info = this.info.find(items => {
+          //   if(items.id == this.branchValue.id) {
+          //     return items.list
+          //   }
+          // });
+          // this.departmentOptions = info.list;
+          this.department = true;
+        } else {
+          this.department = false;
+        }
+      }, 500);
+    }
   },
   validations: {
-    metterGroupName: {
+    employesName: {
       required
     },
-    metterName: {
+    employesJobTitle: {
       required
     },
-    metterCount: {
+    branchValue: {
       required
-    },
-    metterGroupNameValue: {
-      required
-    },
-    metterUnitValue: {
-      required
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -540,7 +587,6 @@ export default {
     // padding: 1rem;
   }
   .clps-menu {
-    
     min-width: 500px;
     .clps {
       padding: 5px;
@@ -566,7 +612,7 @@ export default {
           color: #002f34;
         }
       }
-      .list {
+      &__list {
         // height: 0;
         position: relative;
         &::before {
@@ -581,82 +627,347 @@ export default {
             left: 10px;
           }
         }
-        .custom-table {
-          margin-left: 50px;
-          margin-right: 200px;
-          margin-bottom: 1px;
-          @media screen and (max-width: 991.5px) {
-            margin-left: 25px;
-            margin-right: 0px;
+      }
+      .custom-table {
+        margin-left: 50px;
+        margin-right: 100px;
+        margin-bottom: 1px;
+        @media screen and (max-width: 991.5px) {
+          margin-left: 25px;
+          margin-right: 0px;
+        }
+        &__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(255, 255, 255, 0.12);
+          padding: 5px 15px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          p {
+            font-weight: 600 !important;
           }
-          &__header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 5px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            p {
-              font-weight: 600 !important;
+        }
+        &__body {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(41, 115, 65, 0.1);
+          padding: 5px 15px;
+          position: relative;
+          margin-bottom: 2px;
+          transition: 0.3s all ease-in-out;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          &::before {
+            content: "";
+            width: 28px;
+            height: 3px;
+            background: rgba($color: #002f34, $alpha: 0.85);
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            transform: translateY(-50%);
+            @media screen and (max-width: 991.5px) {
+              width: 15px;
+              top: 50%;
+              left: -15px;
             }
           }
-          &__body {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+          &:hover {
+            background: rgba($color: #002f34, $alpha: 0.04);
+          }
+        }
+        &__body-down {
+          &::before {
+            content: "";
+            width: 28px;
+            height: 3px;
+            background: rgba($color: #002f34, $alpha: 0.85);
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            transform: translateY(-50%);
+            @media screen and (max-width: 991.5px) {
+              width: 15px;
+              top: 50%;
+              left: -15px;
+            }
+          }
+          &-header {
             background: rgba(41, 115, 65, 0.1);
             padding: 5px 15px;
             position: relative;
             margin-bottom: 2px;
             transition: 0.3s all ease-in-out;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            &::before {
-              content: "";
-              width: 28px;
-              height: 3px;
-              background: rgba($color: #002f34, $alpha: 0.85);
-              position: absolute;
-              top: 50%;
-              left: -28px;
-              transform: translateY(-50%);
-              @media screen and (max-width: 991.5px) {
-                width: 15px;
-                top: 50%;
-                left: -15px;
-              }
-            }
-            &:hover {
-              background: rgba($color: #002f34, $alpha: 0.04);
-            }
           }
-          p {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: "Roboto";
-            font-size: 18px;
-            font-weight: 400;
-            color: rgba($color: #002f34, $alpha: 0.85);
-          }
-          .btns {
+          &-body {
             display: flex;
             justify-content: space-between;
-            .btn {
-              padding: 0.2rem 0.5rem;
+            align-items: center;
+            background: rgba(41, 115, 65, 0.1);
+            margin-left: 30px;
+            margin-right: 100px;
+            margin-bottom: 1px;
+            position: relative;
+            @media screen and (max-width: 991.5px) {
+              margin-left: 25px;
+              margin-right: 0px;
+            }
+            &::before {
+              content: "";
+              width: 3px;
+              height: 100%;
+              background: rgba($color: #002f34, $alpha: 0.85);
+              position: absolute;
+              top: 0;
+              left: -10px;
+              // @media screen and (max-width: 991.5px) {
+              //   left: -10px;
+              // }
             }
           }
-          .w-1 {
-            width: 5%;
+        }
+        p {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: "Roboto";
+          font-size: 18px;
+          font-weight: 400;
+          color: rgba($color: #002f34, $alpha: 0.85);
+        }
+        .btns {
+          display: flex;
+          justify-content: space-between;
+          .btn {
+            padding: 0.2rem 0.5rem;
           }
-          .w-2 {
-            width: 50%;
+        }
+        .w-1 {
+          width: 5%;
+        }
+        .w-2 {
+          width: 50%;
+        }
+        .w-3 {
+          width: 36%;
+        }
+        .w-4 {
+          width: 80px;
+        }
+      }
+    }
+  }
+  .clps-menu-down {
+    // min-width: 500px;
+    margin-left: 50px;
+    margin-right: 100px;
+    margin-bottom: 1px;
+    // position: relative;
+    @media screen and (max-width: 991.5px) {
+      margin-left: 25px;
+      margin-right: 0px;
+    }
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 5px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      margin-left: 50px;
+      margin-right: 100px;
+      margin-bottom: 1px;
+      p {
+        font-family: "Roboto";
+        font-size: 18px;
+        font-weight: 400;
+        color: rgba(0, 47, 52, 0.85);
+        font-weight: 600 !important;
+      }
+    }
+    .clps-down {
+      // padding: 5px;
+      &__button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Roboto";
+        font-size: 20px;
+        font-weight: 400;
+        background: rgba($color: #002f34, $alpha: 0.3);
+        padding: 5px 20px;
+        cursor: pointer;
+        position: relative;
+        &::before {
+          content: "";
+          width: 28px;
+          height: 3px;
+          background: rgba($color: #002f34, $alpha: 0.85);
+          position: absolute;
+          top: 50%;
+          left: -28px;
+          transform: translateY(-50%);
+          @media screen and (max-width: 991.5px) {
+            width: 15px;
+            top: 50%;
+            left: -15px;
           }
-          .w-3 {
-            width: 36%;
+        }
+        .btns {
+          width: 100px;
+          display: flex;
+          justify-content: space-between;
+        }
+        p {
+          font-family: "Roboto";
+          font-size: 20px;
+          font-weight: 400;
+          color: #002f34;
+        }
+      }
+      &__list {
+        // height: 0;
+        position: relative;
+        &::before {
+          content: "";
+          width: 3px;
+          height: 100%;
+          background: rgba($color: #002f34, $alpha: 0.85);
+          position: absolute;
+          top: 0;
+          left: 20px;
+          @media screen and (max-width: 991.5px) {
+            left: 10px;
           }
-          .w-4 {
-            width: 80px;
+        }
+      }
+      .custom-table-down {
+        margin-left: 50px;
+        margin-right: 100px;
+        margin-bottom: 1px;
+        @media screen and (max-width: 991.5px) {
+          margin-left: 25px;
+          margin-right: 0px;
+        }
+        &__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(255, 255, 255, 0.12);
+          padding: 5px 15px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          p {
+            font-weight: 600 !important;
           }
+        }
+        &__body {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(41, 115, 65, 0.1);
+          padding: 5px 15px;
+          position: relative;
+          margin-bottom: 2px;
+          transition: 0.3s all ease-in-out;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          &::before {
+            content: "";
+            width: 28px;
+            height: 3px;
+            background: rgba($color: #002f34, $alpha: 0.85);
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            transform: translateY(-50%);
+            @media screen and (max-width: 991.5px) {
+              width: 15px;
+              top: 50%;
+              left: -15px;
+            }
+          }
+          &:hover {
+            background: rgba($color: #002f34, $alpha: 0.04);
+          }
+        }
+        &__body-down {
+          &::before {
+            content: "";
+            width: 28px;
+            height: 3px;
+            background: rgba($color: #002f34, $alpha: 0.85);
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            transform: translateY(-50%);
+            @media screen and (max-width: 991.5px) {
+              width: 15px;
+              top: 50%;
+              left: -15px;
+            }
+          }
+          &-header {
+            background: rgba(41, 115, 65, 0.1);
+            padding: 5px 15px;
+            position: relative;
+            margin-bottom: 2px;
+            transition: 0.3s all ease-in-out;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          &-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(41, 115, 65, 0.1);
+            margin-left: 30px;
+            margin-right: 100px;
+            margin-bottom: 1px;
+            position: relative;
+            @media screen and (max-width: 991.5px) {
+              margin-left: 25px;
+              margin-right: 0px;
+            }
+            &::before {
+              content: "";
+              width: 3px;
+              height: 100%;
+              background: rgba($color: #002f34, $alpha: 0.85);
+              position: absolute;
+              top: 0;
+              left: -10px;
+              // @media screen and (max-width: 991.5px) {
+              //   left: -10px;
+              // }
+            }
+          }
+        }
+        p {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: "Roboto";
+          font-size: 18px;
+          font-weight: 400;
+          color: rgba($color: #002f34, $alpha: 0.85);
+        }
+        .btns {
+          display: flex;
+          justify-content: space-between;
+          .btn {
+            padding: 0.2rem 0.5rem;
+          }
+        }
+        .w-1 {
+          width: 5%;
+        }
+        .w-2 {
+          width: 50%;
+        }
+        .w-3 {
+          width: 36%;
+        }
+        .w-4 {
+          width: 80px;
         }
       }
     }
@@ -692,34 +1003,26 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #002f34;
+      border-bottom: 2px solid #212529;
       p {
-        width: 60%;
         font-family: 'Roboto';
         font-size: 20px;
         font-weight: 400;
+        cursor: pointer;
         padding: 5px 16px;
         color: rgb(129, 129, 129);
-        text-align: center;
         transition: 0.3s all ease-in-out;
-        cursor: pointer;
-        @media screen and (max-width: 575.5px) {
-          font-size: 18px;
-        }
         &:hover {
           color: #000;
           background: rgb(230, 230, 230);
         }
-        &:nth-child(2) {
-          width: 40%;
-        }
       }
       .active {
         color: #fff;
-        background: #002f34;
+        background: #212529;
         &:hover {
           color: #fff;
-          background: #002f34;
+          background: #212529;
         }
       }
     }
@@ -727,7 +1030,6 @@ export default {
       width: 400px;
       display: flex;
       flex-direction: column;
-      margin-top: 15px;
       @media screen and (max-width: 575.5px) {
         width: 290px;
       }
@@ -735,7 +1037,6 @@ export default {
         width: 100%;
         margin-bottom: 12px;
       }
-      
       .selects {
         position: relative;
         width: 100%;
@@ -815,6 +1116,9 @@ export default {
           font-family: 'Roboto';
           padding: 8px 30px;
           text-transform: uppercase;
+          @media screen and (max-width: 575.5px) {
+            padding: 8px 16px;
+          }
         }
       }
     }
