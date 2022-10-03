@@ -129,6 +129,9 @@ export default {
         case "SendingProduct":
           this.isActiveItem = 4;
           break;
+        case "SendingAddProduct":
+          this.isActiveItem = 4;
+          break;
         case "ReceptionFinishedProduct":
           this.isActiveItem = 5;
           break;

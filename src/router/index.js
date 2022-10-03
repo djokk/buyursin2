@@ -17,6 +17,7 @@ import Users from '@/views/Admin/Add/Users.vue'
 import Product from '@/views/Admin/Product/Product.vue'
 import SendingFinishedProduct from '@/views/Admin/Product/Sending/SendingFinishedProduct.vue'
 import SendingProduct from '@/views/Admin/Product/Sending/SendingProduct.vue'
+import SendingAddProduct from '@/views/Admin/Product/Sending/SendingAddProduct.vue'
 import ReceptionFinishedProduct from '@/views/Admin/Product/Reception/ReceptionFinishedProduct.vue'
 import ReceptionProduct from '@/views/Admin/Product/Reception/ReceptionProduct.vue'
 
@@ -164,6 +165,14 @@ const routes = [
     path: '/sending/product',
     name: 'SendingProduct',
     component: SendingProduct,
+    meta: {
+      layout: 'Default'
+    }
+  },
+  {
+    path: '/sending/product/add',
+    name: 'SendingAddProduct',
+    component: SendingAddProduct,
     meta: {
       layout: 'Default'
     }

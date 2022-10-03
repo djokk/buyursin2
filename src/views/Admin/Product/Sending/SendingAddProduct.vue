@@ -1,73 +1,48 @@
 <template>
-  <div class="modelsItem">
+  <section class="SendingAddProduct">
     <div class="breadcrumb p-0">
-      <router-link :to="{name: 'Dashboard'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
       <div class="breadcrumb__item">
-        <i class="fa fa-angle-right"></i>
-        <router-link :to="{name: 'Product', query: { name: 'Reception'}}" class="breadcrumb__link"><i class='bx bx-window-open'></i></router-link>
-      </div>
-      <div class="breadcrumb__item">
-        <i class="fa fa-angle-right"></i>
-        <p>{{ $t('Материал') }}</p>
+        <router-link :to="{name: 'SendingProduct'}" class="breadcrumb__link">
+          <i class="fa fa-angle-left"></i>
+          <p>{{ $t('back') }}</p>
+        </router-link>
       </div>
     </div>
-    <div class="wrapper">
-      <div v-if="infoAcceptItems != []" class="card-custom">
-        <div class="table-custom">
-          <div class="table-custom__header">
-            <p class="w-1">{{ $t('branchName') }}</p>
-            <p class="w-2">{{ $t('date') }}</p>
-            <p class="w-3">{{ $t('state') }}</p>
-            <p class="w-4"></p>
-          </div>
-          <div class="table-custom__body">
-            <div v-for="item in infoAcceptItems" :key="item.id" class="table-custom__body-item">
-              <p class="w-1">{{ item.sendBranchName }}</p>
-              <p class="w-2">{{ item.sendDateTime | moment("DD/MM/YYYY - H:m") }}</p>
-              <p class="w-3">{{ item.recvState == 1 ? $t('Ожидание приемки') : item.recvState == 2 ? $t('Принято') : $t('Отклонено') }}</p>
-              <div class="w-4 btns">
-                <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button>
-                <!-- <button @click="changeModalAdd(item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button> -->
-                <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-              </div>
-            </div>
+    <div class="row">
+      <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12 mb-3">
+        <div class="filter-card">
+          <div class="selects">
+            <multiselect v-model="branchValue" :class="$v.branchValue.$error ? 'is-invalid': ''" deselect-label="Невозможно удалить" :allow-empty="false" label="name" track-by="id" :options="branchOption" :multiple="false" :taggable="false" :searchable="false"></multiselect>
+            <span>Филиал</span>
           </div>
         </div>
       </div>
+    </div>
+    <div class="wrapper">
       <div class="card-custom">
         <div class="table-custom">
           <div class="table-custom__header">
-            <p class="w-1">{{ $t('branchName') }}</p>
-            <p class="w-2">{{ $t('date') }}</p>
-            <p class="w-3">{{ $t('state') }}</p>
-            <p class="w-4"></p>
+            <p class="w-1">{{ $t('name') }}</p>
+            <p class="w-2">{{ $t('count') }}</p>
+            <p class="w-3"></p>
           </div>
           <div class="table-custom__body">
-            <div v-for="item in infoAcceptItemClaim" :key="item.id" class="table-custom__body-item">
-              <p class="w-1">{{ item.sendBranchName }}</p>
-              <p class="w-2">{{ item.sendDateTime | moment("DD/MM/YYYY - H:m") }}</p>
-              <p class="w-3">{{ item.recvState == 1 ? $t('Ожидание приемки') : item.recvState == 2 ? $t('Принято') : $t('Отклонено') }}</p>
-              <div class="w-4 btns">
-                <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button>
+            <div v-for="item in sendInfo" :key="item.id" class="table-custom__body-item">
+              <p class="w-1">{{ item.itemTemplateName }}</p>
+              <p class="w-2">{{ item.count }} {{ item.unit }}</p>
+              <div class="w-3 btns">
+                <!-- <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button> -->
                 <!-- <button @click="changeModalAdd(item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button> -->
-                <!-- <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button> -->
+                <button @click="delMetter(item.itemTemplate)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
               </div>
             </div>
+            <div v-if="sendInfo.length != 0" @click="createItemClaim()" class="btn btn-success w-100 mt-3 p-2">{{ $t('Отправить') }}</div>
           </div>
         </div>
       </div>
     </div>
     <div @click="openModalAdd()" class="btn-add">
       <i class="fa fa-plus-circle" aria-hidden="true"></i>
-    </div>
-    <div v-if="modalDelete" class="modal-delete">
-      <form @submit.prevent="delComponent()" class="form" action="">
-        <p>{{ $t('textDelete') }}</p>
-        <div class="btns">
-          <button class="btn btn-success" type="submit">{{ $t('yes')}}</button>
-          <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">{{ $t('not')}}</button>
-        </div>
-      </form>
     </div>
     <div v-if="modalAdd" class="modal-add">
       <form class="form" action="">
@@ -80,52 +55,51 @@
           <span>{{ $t('matter') }}</span>
         </div>
         <div class="name count">
-          <div class="position-relative">
-            <input id="count" v-model="count" :class="$v.count.$error ? 'is-invalid': ''" class="input" type="number" autocomplete="off">
-            <p>{{ unit != '' ? unit.name : '' }}</p>
+          <div class="position-relative" :class="$v.count.$error ? 'is-invalid': ''">
+            <input id="count" v-model="count" class="input" type="number" autocomplete="off">
+            <p>{{ unitValue != '' ? unitValue.name : '' }}</p>
           </div>
           <span>{{ $t('count') }}</span>
         </div>
         <div class="btns">
-          <button v-if="btnChange != true" @click.prevent="addItempurchase()" class="btn btn-success" type="button">{{ $t('add') }}</button>
-          <button v-else-if="btnChange == true" @click.prevent="editItempurchase()" class="btn btn-warning" type="button">{{ $t('change') }}</button>
+          <button @click.prevent="addMetter()" class="btn btn-success" type="button">{{ $t('add') }}</button>
           <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">{{ $t('cancel') }}</button>
         </div>
       </form>
     </div>
-    <div v-show="modalAdd || modalDelete" class="modal-bg"></div>
+    <div v-show="modalAdd" class="modal-bg"></div>
     <Loading v-show="loading"/>
-  </div>
+  </section>
 </template>
 
 <script>
 import axios from 'axios';
 import { required } from 'vuelidate/lib/validators';
 import Loading from '@/components/Loading.vue';
+// import moment from 'moment';
 
 export default {
-  name: 'ModelsItem',
+  name: 'SendingAddProduct',
   data() {
     return {
       loading: false,
       modalAdd: false,
-      modalDelete: false,
-      btnChange: false,
-      info: [],
-      metter: [],
-      units: [],
-      unit: '',
+      castelmetterValue: false,
+      branchValue: [],
+      branchOption: [],
       metterGroupValue: '',
       metterGroupOption: [],
       metterValue: '',
       metterOption: [],
-      metterAll: [],
-      infoAcceptItems: [],
-      infoAcceptItemClaim: [],
+      metter: [],
+      unitValue: '',
+      unitOption: [],
       count: '',
-      castelmetterValue: false,
+      info: [],
+      sendInfo: [],
+      ItemClaim: [],
       token: '',
-      api: ''
+      api: '',
     }
   },
   components: {
@@ -135,42 +109,32 @@ export default {
     this.api = window.MY_CONFIG_BUYURSIN.api;
     // this.token = localStorage.token;
   },
-  mounted() {    
+  mounted() {
     this.token = sessionStorage.getItem('token');
-    this.loading = true;
-    this.listAcceptItems();
-    this.acceptItemClaim();
+    this.getBranches();
     this.getMetterGroups();
   },
   methods: {
-    listAcceptItems() {
-      this.infoAcceptProducts = [];
-      axios.get(`${this.api}/listAcceptItems/`, {
+    getBranches() {
+      this.loading = true;
+      this.branchOption = [];
+      axios.get(`${this.api}/branches/`, {
           headers: {
             'Authorization': `Token ${this.token}`
           }
         })
         .then(response => {
           // console.log(response.data);
-          this.infoAcceptItems = response.data;
+          this.branchOption = response.data;
         })
-        .catch(e => console.log(e))
-        .finally(()=> {
-          this.loading = false;
-        });
-    },
-    acceptItemClaim() {
-      this.infoAcceptProducts = [];
-      axios.get(`${this.api}/acceptItemClaim/`, {
-          headers: {
-            'Authorization': `Token ${this.token}`
+        .catch(error => {
+          // console.log(e.response);
+          if(error.response.status == 401) {
+            this.$toast.error(error.response.data.detail);
+            sessionStorage.setItem('token', '');
+            this.$router.push({ name: 'Auth' });
           }
         })
-        .then(response => {
-          // console.log(response.data);
-          this.infoAcceptItemClaim = response.data;
-        })
-        .catch(e => console.log(e))
         .finally(()=> {
           this.loading = false;
         });
@@ -221,7 +185,7 @@ export default {
               }
             }
           }
-          this.metterAll = response.data;
+          // this.metterAll = response.data;
           this.getUnits();
         })
         .catch(e => console.log(e));
@@ -233,101 +197,26 @@ export default {
           }
         })
         .then(responce => {
-          this.units = responce.data;
+          this.unitOption = responce.data;
         })
         .catch(e => console.log(e));
     },
-    addItempurchase() {
+    addMetter() {
       this.$v.$touch()
-      if(this.$v.metterGroupValue.$invalid || this.$v.metterValue.$invalid || this.$v.count.$invalid) {
+      if (this.$v.metterGroupValue.$invalid || this.$v.metterValue.$invalid || this.$v.count.$invalid) {
         this.$toast.open({
           message: 'Ввидите данные правильно',
           type: "error"
         })
       } else {
-        this.loading = true;
-        axios.post(`${this.api}/itempurchase/`, {
-            "itemTemplate": this.metterValue.id,
-            "count": this.count
-          }, 
-          {
-            headers: {
-              'Authorization': `Token ${this.token}`
-            }
-          })
-          .then(response => {
-            if(response.data.code == 1) {
-              this.$toast.success('Добавленно');
-              // this.getComponents();
-            } else {
-              this.$toast.error(response.data.msg);
-            }
-          })
-          .catch(e => console.log(e))
-          .finally(()=> {
-            this.closeModalAdd();
-            this.loading = false;
-          });
-      }
-    },
-    editComponents() {
-      this.$v.$touch()
-      if(this.$v.metterGroupValue.$invalid || this.$v.metterValue.$invalid || this.$v.count.$invalid) {
-        this.$toast.open({
-          message: 'Ввидите данные правильно',
-          type: "error"
-        })
-      } else {
-        this.loading = true;
-        axios.put(`${this.api}/components/${this.componentId}/`, {
-            "productTemplate": this.$route.params.id,
-            "itemTemplate": this.metterValue.id,
-            "count": this.count
-          }, 
-          {
-            headers: {
-              'Authorization': `Token ${this.token}`
-            }
-          })
-          .then(response => {
-            if(response.data.code == 1) {
-              this.$toast.success('Изменнено');
-              this.getComponents();
-            } else {
-              this.$toast.error(response.data.msg);
-            }
-          })
-          .catch(e => console.log(e))
-          .finally(()=> {
-            this.closeModalAdd();
-            this.loading = false;
-          });
-      }
-    },
-    delComponent() {
-      this.loading = true;
-      axios.delete(`${this.api}/component-delete/${this.componentId}/`, {
-          headers: {
-            'Authorization': `Token ${this.token}`
-          }
-        })
-        .then(response => {
-          if(response.data.code == 1) {
-            this.$toast.success('Удаленно');
-            this.getComponents();
-          } else {
-            this.$toast.error(response.data.msg);
-          }
-        })
-        .catch(e => console.log(e))
-        .finally(()=> {
-          this.closeModalAdd();
-          this.loading = false;
+        this.sendInfo.push({
+          "itemTemplateName": this.metterValue.name, //- Id сырья
+          "itemTemplate": this.metterValue.id, //- Id сырья
+          "count": +this.count,
+          "unit": this.unitValue.name
         });
-    },
-    openModalDel(id) {
-      this.componentId = id;
-      this.modalDelete = true;
+        this.closeModalAdd();
+      }
     },
     openModalAdd() {
       this.modalAdd = true;
@@ -336,38 +225,66 @@ export default {
       this.modalAdd = false;
       this.modalDelete = false;
       this.btnChange = false;
-      this.componentId = '';
       this.metterGroupValue = '';
       this.metterValue = '';
       this.count = '';
-      this.unit = '';
+      this.unitValue = '';
       this.$v.$reset();
     },
-    changeModalAdd(info) {
-      // console.log(info);
-      this.modalAdd = true;
-      this.btnChange = true;
-      this.text = false;
-      this.componentId = info.id;
-      this.count = info.count;
-      this.castelmetterValue = true;
-      this.metterValue = this.metterAll.find(items => {
-        if(items.id == info.itemTemplate) {
-          return items
-        }
-      });
-      this.metterGroupValue = this.metterGroupOption.find(items => {
-        if(items.code == this.metterValue.group) {
-          return items
-        }
-      });
+    delMetter(id) {
+      this.sendInfo = this.sendInfo.filter(item => item.itemTemplate != id);
     },
+    createItemClaim() {
+      this.$v.$touch()
+      if(this.$v.branchValue.$invalid && this.sendInfo.length != 0) {
+        this.$toast.open({
+          message: 'Ввидите данные правильно',
+          type: "error"
+        })
+      } else {
+        this.loading = true;
+        // let items = this.ItemClaim;
+        // for (let index = 0; index < items.length; index++) {
+        //   delete items[index].unit;
+        //   delete items[index].itemTemplateName;
+        // }
+        // const info = {
+        //   "sendToBranchId": this.branchValue.id,			//- Id Филиала куда отправляем	
+        //   "sentToBranchName": this.branchValue.name,	//- Название филиала 
+        //   "items": this.ItemClaim
+        // };
+        // console.log(info);
+        axios.post(`${this.api}/createItemClaim/`, {
+            "sendToBranchId": this.branchValue.id,			//- Id Филиала куда отправляем	
+            "sentToBranchName": this.branchValue.name,	//- Название филиала 
+            "items": this.ItemClaim
+          }, 
+          {
+            headers: {
+              'Authorization': `Token ${this.token}`
+            }
+          })
+          .then(response => {
+            if(response.data.code == 1) {
+              this.$toast.success('Отправленно');
+              setTimeout(() => {
+                this.$router.push({ name: 'SendingProduct' });
+              }, 2000);
+            } else {
+              this.$toast.error(response.data.msg);
+            }
+          })
+          .catch(e => console.log(e))
+          .finally(()=> {
+            this.closeModalAdd();
+            this.loading = false;
+          });
+      }
+    }
   },
   watch: {
     metterGroupValue() {
       this.metterOption = [];
-      // if(this.btnChange == false) {
-        // }
       if(this.metterGroupValue != '') {
         const metter = this.metter.find(item => {
           if(item.id == this.metterGroupValue.code) {
@@ -380,31 +297,36 @@ export default {
         } else {
           this.castelmetterValue = false;
         }
-        // setTimeout(() => {
-        //   this.metterOption.find(item => {
-        //     if(item.id != this.metterValue.id) {
-        //       this.metterValue = '';
-        //     }
-        //   });
-          
-        // }, 1000);
       }
     },
     metterValue() {
       if(this.metterValue != '') {
-        this.unit = this.units.find(item => {
+        this.unitValue = this.unitOption.find(item => {
           if(item.id == this.metterValue.unit) {
             return item
           }
         });
       }
     },
-    // count() {
-    //   const x = document.getElementById('count').value + ' ' + this.unit.name
-    //   console.log(x);
-    // }
+    sendInfo() {
+      this.ItemClaim = [];
+      for (let index = 0; index < this.sendInfo.length; index++) {
+        this.ItemClaim.push({
+          'itemTemplate': this.sendInfo[index].itemTemplate,
+          'count': this.sendInfo[index].count
+        });
+      }
+      // this.ItemClaim = this.sendInfo;
+      // for (let index = 0; index < this.sendInfo.length; index++) {
+        // delete this.ItemClaim.unit;
+        // delete this.ItemClaim.itemTemplateName;
+      // }
+    }
   },
   validations: {
+    branchValue: {
+      required
+    },
     metterGroupValue: {
       required
     },
@@ -419,7 +341,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.modelsItem {
+.SendingAddProduct {
   @media screen and (max-width: 991.5px) {
     margin-left: 0;
     padding: 0px 10px;
@@ -454,8 +376,64 @@ export default {
       }
     }
   }
-  .wrapper {
-    margin-bottom: 90px;
+  .filter-card {
+    // display: flex;
+    // justify-content: space-between;
+    // align-items: center;
+    background-color: #fff;
+    transition: all .5s ease-in-out;
+    position: relative;
+    border: 0rem solid transparent;
+    border-radius: 1.25rem;
+    box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(43, 37, 51, 0.05);
+    padding: 15px;
+    .selects {
+      // background: #fff;
+      .multiselect {
+        cursor: pointer;
+        border: 2px solid rgba(0,0,0,.12);
+        border-radius: 5px;
+        // margin-bottom: 12px;
+        padding: 2px 0;
+        font-family: 'Roboto';
+        &:hover {
+          border-color: rgb(175, 175, 175);
+          transition: 0.3s all ease-in-out;
+        }
+      }
+      .multiselect__single {
+        font-family: 'Roboto';
+      }
+      span {
+        padding: 2px 5px 0 5px !important;
+        margin-bottom: 2px;
+        z-index: 10;
+      }
+      .multiselect:hover+span {
+        color: rgb(175, 175, 175);
+        transition: 0.3s all ease-in-out;
+      }
+      .multiselect .multiselect__tags {
+        background: transparent !important;
+      }
+    }
+  }
+  
+  .selects {
+    position: relative;
+    span {
+      position: absolute;
+      z-index: 2;
+      top: 0%;
+      left: 10px;
+      transform: translateY(-50%);
+      font-family: 'Roboto';
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(0,0,0,.4);
+      background: #fff;
+      padding: 2px 5px;
+    }
   }
   .card-custom {
     // position: relative;
@@ -467,13 +445,13 @@ export default {
     background-clip: border-box;
     border: 0 solid transparent;
     border-radius: 0.25rem;
+    margin-bottom: 4.5rem;
     box-shadow: 0 0.3rem 0.8rem rgba(0,0,0,0.12);
     padding: 1rem;
-    margin-bottom: 4.5rem;
     overflow: scroll hidden;
   }
   .table-custom {
-    min-width: 500px;
+    min-width: 700px;
     // overflow: scroll hidden;
     &__header {
       display: flex;
@@ -540,25 +518,13 @@ export default {
       white-space: pre-wrap;
     }
     .w-1 {
-      width: calc(100%/3);
-      // @media screen and (max-width: 767.5px) {
-      //   width: 30%;
-      // }
+      width: 50%;
     }
     .w-2 {
-      width: calc(100%/3);
-      // @media screen and (max-width: 575.5px) {
-      //   width: 50%;
-      // }
-      // @media screen and (max-width: 767.5px) {
-      //   width: 60%;
-      // }
+      width: 50%;
     }
     .w-3 {
-      width: calc(100%/3);
-    }
-    .w-4 {
-      width: 180px;
+      width: 100px;
     }
   }
   .btn-add {
@@ -576,7 +542,7 @@ export default {
     align-items: center;
     .fa {
       font-size: 50px;
-      color: #1d9d74;
+      color: #28a745;
     }
   }
   .modal-add {
@@ -748,9 +714,6 @@ export default {
       width: 400px;
       display: flex;
       flex-direction: column;
-      @media screen and (max-width: 575.5px) {
-        width: 290px;
-      }
       p {
         font-family: 'Roboto';
         font-size: 24px;
@@ -772,9 +735,7 @@ export default {
       }
     }
   }
-  .name,
-  .selects,
-  .number {
+  .name {
     position: relative;
     span {
       position: absolute;
@@ -832,8 +793,19 @@ export default {
       left: 0px;
     }
   }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+      /* display: none; <- Crashes Chrome on hover */
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  }
   .is-invalid {
     border-color: red !important;
+  }
+  .is-invalid {
+    input {
+      border-color: red !important;
+    }
   }
   .is-invalid + span {
     color: red !important;
@@ -842,19 +814,4 @@ export default {
     color: red !important;
   }
 }
-
-.nested-enter-active, .nested-leave-active {
-	transition: all 0.2s ease-in-out;
-}
-/* delay leave of parent element */
-.nested-leave-active {
-  transition-delay: 0s;
-}
-.nested-enter-from,
-.nested-leave-to {
-  transform: translateY(30px);
-  opacity: 0;
-  font-style: italic;
-}
-
 </style>
