@@ -20,6 +20,9 @@
             <Transition duration="350" name="nested">
               <div v-if="collapseActive == item.employeId" class="clps__list list">
                 <div class="custom-table">
+                  <div v-if="item.works.length != 0" class="custom-table__body-head">
+                    <p>{{ $t('Зар. плата') }}</p>
+                  </div>
                   <div v-if="item.works.length != 0" class="custom-table__header">
                     <p class="w-1">№</p>
                     <p class="w-2">{{ $t('Дата') }}</p>
@@ -50,19 +53,19 @@
                     <p class="w-5"></p>
                     <p class="w-6">-{{ itemPenalties.price }}</p>
                   </div>
-                  <div class="custom-table__body-total">
+                  <div v-if="item.to_paid != 0" class="custom-table__body-total">
                     <p>{{ $t('Общий ЗП') }}: </p>
                     <p class="w-6">{{ item.to_paid }}</p>
                   </div>
-                  <div class="custom-table__body-total">
+                  <div v-if="item.to_subtract != 0" class="custom-table__body-total">
                     <p>{{ $t('Общий Штраф') }}: </p>
                     <p class="w-6">-{{ item.to_subtract }}</p>
                   </div>
-                  <div class="custom-table__body-total">
+                  <div v-if="item.total_to_paid != 0" class="custom-table__body-total">
                     <p>{{ $t('ИТОГО') }}: </p>
                     <p class="w-6">{{ item.total_to_paid }}</p>
                   </div>
-                  <div class="custom-table__body-total">
+                  <div v-if="item.total_to_paid != 0" class="custom-table__body-total">
                     <button @click="openModalDeleteGroup(item.employeId)" type="button" class="w-6 btn btn-success">{{ $t('Оплатить') }}</button>
                   </div>
                 </div>

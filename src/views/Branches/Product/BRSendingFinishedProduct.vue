@@ -1,18 +1,14 @@
 <template>
-  <section class="ReceptionFinishedProduct">
+  <section class="BRSendingFinishedProduct">
     <div class="breadcrumb p-0">
-      <router-link :to="{name: 'Dashboard'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
+      <router-link :to="{name: 'BRDashboard'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
-        <router-link :to="{name: 'Product', query: { name: 'Reception'}}" class="breadcrumb__link"><i class='bx bx-upload'></i></router-link>
-      </div>
-      <div class="breadcrumb__item">
-        <i class="fa fa-angle-right"></i>
-        <p>{{ $t('color') }}</p>
+        <p>{{ $t('Отправка') }}</p>
       </div>
     </div>
     <div class="wrapper">
-      <div v-if="infoSend != []" class="card-custom">
+      <div class="card-custom">
         <div class="table-custom">
           <div class="table-custom__header">
             <p class="w-1">{{ $t('branchName') }}</p>
@@ -23,7 +19,7 @@
           <div class="table-custom__body">
             <div v-for="item in infoSend" :key="item.id" class="table-custom__body-item">
               <p class="w-1">{{ item.sendBranchName }}</p>
-              <p class="w-2">{{ item.sendDateTime | moment("DD/MM/YYYY - H:m") }}</p>
+              <p class="w-2">{{ item.sendDateTime | moment("DD/MM/YYYY - H:mm") }}</p>
               <p class="w-3">{{ item.recvState == 1 ? $t('Ожидание приемки') : item.recvState == 2 ? $t('Принято') : $t('Отклонено') }}</p>
               <div class="w-4 btns">
                 <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button>
@@ -34,57 +30,9 @@
           </div>
         </div>
       </div>
-      <div class="card-custom">
-        <div class="table-custom">
-          <div class="table-custom__header">
-            <p class="w-1">{{ $t('branchName') }}</p>
-            <p class="w-2">{{ $t('date') }}</p>
-            <p class="w-3">{{ $t('state') }}</p>
-            <p class="w-4"></p>
-          </div>
-          <div class="table-custom__body">
-            <div v-for="item in info" :key="item.id" class="table-custom__body-item">
-              <p class="w-1">{{ item.sendBranchName }}</p>
-              <p class="w-2">{{ item.sendDateTime | moment("DD/MM/YYYY - H:m") }}</p>
-              <p class="w-3">{{ item.recvState == 1 ? $t('Ожидание приемки') : item.recvState == 2 ? $t('Принято') : $t('Отклонено') }}</p>
-              <div class="w-4 btns">
-                <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button>
-                <!-- <button @click="changeModalAdd(item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button> -->
-                <!-- <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button> -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <div @click="openModalAdd()" class="btn-add">
       <i class="fa fa-plus-circle" aria-hidden="true"></i>
-    </div>
-    <div v-if="modalDelete" class="modal-delete">
-      <form @submit.prevent="delColor()" class="form" action="">
-        <p>{{ $t('textDelete') }}</p>
-        <div class="btns">
-          <button class="btn btn-success" type="submit">{{ $t('yes')}}</button>
-          <button @click="modalDelete = !modalDelete" class="btn btn-outline-danger" type="button">{{ $t('not')}}</button>
-        </div>
-      </form>
-    </div>
-    <div v-if="modalAdd" class="modal-add">
-      <form @submit.prevent="addColor()" class="form" action="">
-        <div class="name">
-          <input v-model="colorCode" :class="$v.colorCode.$error ? 'is-invalid': ''" class="input" type="text">
-          <span>{{ $t('colorCode') }}</span>
-        </div>
-        <div class="name">
-          <input v-model="colorName" :class="$v.colorName.$error ? 'is-invalid': ''" class="input" type="text">
-          <span>{{ $t('colorName') }}</span>
-        </div>
-        <div class="btns">
-          <button v-if="btnChange != true" class="btn btn-success" type="submit">{{ $t('add') }}</button>
-          <button v-else-if="btnChange == true" @click.prevent="editColor()" class="btn btn-warning" type="button">{{ $t('change') }}</button>
-          <button @click="closeModalAdd()" class="btn btn-outline-danger" type="button">{{ $t('cancel') }}</button>
-        </div>
-      </form>
     </div>
     <div v-if="modalInfo" class="modal-info">
       <div @click="closeInfoModal()" class="close-btn">
@@ -110,32 +58,35 @@
         </div>
       </div>
     </div>
-    <div v-show="modalAdd || modalDelete || modalInfo" class="modal-bg"></div>
+    <div v-if="modalDelete" class="modal-delete">
+      <form @submit.prevent="deleteItemClaim()" class="form" action="">
+        <p>{{ $t('textDelete') }}</p>
+        <div class="btns">
+          <button class="btn btn-success" type="submit">{{ $t('yes')}}</button>
+          <button @click="modalDelete = !modalDelete" class="btn btn-outline-danger" type="button">{{ $t('not')}}</button>
+        </div>
+      </form>
+    </div>
+    <div v-show="modalInfo || modalDelete" class="modal-bg"></div>
     <Loading v-show="loading"/>
   </section>
 </template>
 
 <script>
 import axios from 'axios';
-import { required } from 'vuelidate/lib/validators';
 import Loading from '@/components/Loading.vue';
 // import moment from 'moment';
 
 export default {
-  name: 'ReceptionFinishedProduct',
+  name: 'BRSendingFinishedProduct',
   data() {
     return {
       loading: false,
-      modalDelete: false,
-      btnChange: false,
-      modalAdd: false,
       modalInfo: false,
+      modalDelete: false,
       infoModal: [],
-      colorId: '',
-      colorCode: '',
-      colorName: '',
-      info: [],
       infoSend: [],
+      claimId: '',
       token: '',
       api: '',
     }
@@ -149,12 +100,12 @@ export default {
   },
   mounted() {
     this.token = sessionStorage.getItem('token');
+    this.loading = true;
     this.listSendProducts();
   },
   methods: {
     listSendProducts() {
       this.loading = true;
-      this.info = [];
       this.infoSend = [];
       axios.get(`${this.api}/listSendProducts/`, {
           headers: {
@@ -162,13 +113,7 @@ export default {
           }
         })
         .then(response => {
-          for (let index = 0; index < response.data.length; index++) {
-            if(response.data[index].recvState != 2) {
-              this.infoSend.push(response.data[index]);
-            } else if(response.data[index].recvState == 2) {
-              this.info.push(response.data[index]);
-            }
-          }
+          this.infoSend = response.data;
         })
         .catch(error => {
           // console.log(e.response);
@@ -182,131 +127,29 @@ export default {
           this.loading = false;
         });
     },
-    addColor() {
-      this.$v.$touch()
-      if (this.$v.colorCode.$invalid || this.$v.colorName.$invalid) {
-        this.$toast.open({
-          message: 'Ввидите данные правильно',
-          type: "error"
-        })
-      } else {
-        this.loading = true;
-        axios.post(`${this.api}/colors/`, {
-            "name": this.colorName,
-            "code": this.colorCode
-          }, 
-          {
-            headers: {
-              'Authorization': `Token ${this.token}`
-            }
-          })
-          .then(response => {
-            if(response.data.code == 1) {
-              this.$toast.success('Добавленно');
-              this.getColor();
-            } else {
-              this.$toast.error(response.data.msg);
-            }
-          })
-          .catch(error => {
-            console.log(error);
-            if(error.response.status == 401) {
-              this.$toast.error(error.response.data.detail);
-            }
-          })
-          .finally(()=> {
-            this.closeModalAdd();
-            this.loading = false;
-          });
-      }
-    },
-    editColor() {
-      this.$v.$touch()
-      if (this.$v.colorCode.$invalid || this.$v.colorName.$invalid) {
-        this.$toast.open({
-          message: 'Ввидите данные правильно',
-          type: "error"
-        })
-      } else {
-        this.loading = true;
-        axios.put(`${this.api}/colors/${this.colorId}/`, {
-            "name": this.colorName,
-            "code": this.colorCode
-          }, 
-          {
-            headers: {
-              'Authorization': `Token ${this.token}`
-            }
-          })
-          .then(response => {
-            if(response.data.code == 1) {
-              this.$toast.success('Изменнено');
-              this.getColor();
-            } else {
-              this.$toast.error(response.data.msg);
-            }
-          })
-          .catch(error => {
-            console.log(error);
-            if(error.response.status == 401) {
-              this.$toast.error(error.response.data.detail);
-            }
-          })
-          .finally(()=> {
-            this.closeModalAdd();
-            this.loading = false;
-          });
-      }
-    },
-    delColor() {
+    deleteItemClaim() {
       this.loading = true;
-      axios.delete(`${this.api}/color-delete/${this.colorId}/`, {
+      axios.get(`${this.api}/deleteItemClaim/?id=${this.claimId}`, {
           headers: {
             'Authorization': `Token ${this.token}`
           }
         })
         .then(response => {
-          if(response.data.code == 1) {
-            this.$toast.success('Удаленно');
-            this.getColor();
-          } else {
-            this.$toast.error(response.data.msg);
-          }
+          console.log(response.data);
+          this.listSendItems();
         })
         .catch(error => {
-            console.log(error);
-            if(error.response.status == 401) {
-              this.$toast.error(error.response.data.detail);
-            }
-          })
+          this.$toast.error(error.response);
+          // console.log(error.response);
+        })
         .finally(() => {
-            this.closeModalAdd();
           this.loading = false;
         });
     },
     openModalAdd() {
       // this.modalAdd = true;
       // this.btnChange = false;
-      this.$router.push({ name: 'WRSendingAddFinishedProduct' });
-    },
-    closeModalAdd() {
-      this.modalAdd = false;
-      this.modalDelete = false;
-      this.btnChange = false;
-      this.colorCode = '';
-      this.colorName = '';
-      this.$v.$reset();
-    },
-    changeModalAdd(item) {
-      this.modalAdd = true;
-      this.btnChange = true;
-      this.colorId = item.id;
-      this.colorCode = item.code;
-      this.colorName = item.name;
-    },
-    openModalDel(id) {
-      this.colorId = id;
-      this.modalDelete = true;
+      this.$router.push({ name: 'BRSendingAddFinishedProduct' });
     },
     openModalInfo(item) {
       this.modalInfo = true;
@@ -316,21 +159,17 @@ export default {
     closeInfoModal() {
       this.modalInfo = false;
       this.infoModal = [];
-    }
-  },
-  validations: {
-    colorCode: {
-      required
     },
-    colorName: {
-      required
+    openModalDel(id) {
+      this.claimId = id;
+      this.modalDelete = true;
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.ReceptionFinishedProduct {
+.BRSendingFinishedProduct {
   @media screen and (max-width: 991.5px) {
     margin-left: 0;
     padding: 0px 10px;
@@ -487,68 +326,6 @@ export default {
       color: #28a745;
     }
   }
-  .modal-add {
-    position: fixed;
-    z-index: 11;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    border-radius: 0.5rem;
-    padding: 12px;
-    .text {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #212529;
-      p {
-        font-family: 'Roboto';
-        font-size: 20px;
-        font-weight: 400;
-        cursor: pointer;
-        padding: 5px 16px;
-        color: rgb(129, 129, 129);
-        transition: 0.3s all ease-in-out;
-        &:hover {
-          color: #000;
-          background: rgb(230, 230, 230);
-        }
-      }
-      .active {
-        color: #fff;
-        background: #212529;
-        &:hover {
-          color: #fff;
-          background: #212529;
-        }
-      }
-    }
-    .form {
-      width: 400px;
-      display: flex;
-      flex-direction: column;
-      @media screen and (max-width: 575.5px) {
-        width: 290px;
-      }
-      .input {
-        width: 100%;
-        margin-bottom: 12px;
-      }
-      .btns {
-        display: flex;
-        justify-content: space-between;
-        .btn {
-          width: 48%;
-          font-family: 'Roboto';
-          padding: 8px 30px;
-          text-transform: uppercase;
-          @media screen and (max-width: 575.5px) {
-            padding: 8px 16px;
-          }
-        }
-      }
-    }
-  }
   .modal-delete {
     position: fixed;
     z-index: 11;
@@ -655,52 +432,6 @@ export default {
       }
     }
   }
-  .name {
-    position: relative;
-    span {
-      position: absolute;
-      z-index: 2;
-      top: 0%;
-      left: 10px;
-      transform: translateY(-50%);
-      font-family: 'Roboto';
-      font-size: 12px;
-      font-weight: 400;
-      color: rgba(0,0,0,.4);
-      background: #fff;
-      padding: 2px 5px;
-    }
-  }
-  .input {
-    width: 100%;
-    font-family: 'Roboto';
-    font-size: 18px;
-    font-weight: 400;
-    color: #5A5A5A;
-    border: 2px solid rgba(0,0,0,.12);
-    border-radius: 5px;
-    padding: 0.5em 0.7em;
-    position: relative;
-    background: transparent;
-    z-index: 1;
-    margin: 0;
-    &:hover {
-      border-color: rgb(175, 175, 175);
-      transition: 0.3s all ease-in-out;
-    }
-    &:focus-visible {
-      border-color: rgb(175, 175, 175);
-      outline: none;
-    }
-  }
-  input:focus-visible+span{
-    transition: 0.3s all ease-in-out;
-    color: rgb(175, 175, 175) !important;
-  }
-  input:hover+span{
-    transition: 0.3s all ease-in-out;
-    color: rgb(175, 175, 175);
-  }
   .modal-bg {
     width: 100%;
     height: 100%;
@@ -712,21 +443,6 @@ export default {
     @media screen and (max-width: 991.5px) {
       left: 0px;
     }
-  }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-      /* display: none; <- Crashes Chrome on hover */
-      -webkit-appearance: none;
-      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-  }
-  .is-invalid {
-    border-color: red !important;
-  }
-  .is-invalid + span {
-    color: red !important;
-  }
-  .is-invalid + span + .fa{
-    color: red !important;
   }
 }
 </style>

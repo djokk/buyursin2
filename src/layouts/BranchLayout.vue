@@ -22,6 +22,12 @@
           <li class="menu__item" @click.prevent="isSidebarActiveItem(4)" :class="[isActiveItem == 4 ? 'active': '']">
             <router-link :to="{ name: 'BRAdd'}" class="menu__link"><i class='bx bxs-layer-plus'></i>{{ $t('add') }}</router-link>
           </li>
+          <li class="menu__item" @click.prevent="isSidebarActiveItem(5)" :class="[isActiveItem == 5 ? 'active': '']">
+            <router-link :to="{ name: 'BRSendingFinishedProduct' }" class="menu__link"><i class='bx bx-upload'></i>{{ $t('Отправка') }}</router-link>
+          </li>
+          <li class="menu__item" @click.prevent="isSidebarActiveItem(6)" :class="[isActiveItem == 6 ? 'active': '']">
+            <router-link :to="{ name: 'BRReceptionProduct' }" class="menu__link"><i class='bx bx-window-open'></i>{{ $t('Прием') }}</router-link>
+          </li>
           <li class="menu__item">
             <button class="menu__btn" @click="removeLogout()">{{ $t('btnExit') }}</button>
           </li>
@@ -32,13 +38,13 @@
       <div @click="openMenu()" class="btn-burger">
         <i class='bx bx-menu'></i>
       </div>
-      <div class="account">
+      <!-- <div class="account">
         <div class="account__text">
           <p class="account__title">Jakhongir</p>
           <p class="account__subtitle">Admin</p>
         </div>
         <img class="account__img" src="/img/account.png" alt="">
-      </div>
+      </div> -->
     </div>
   </div>
   <!-- MAIN CONTENT -->
@@ -89,14 +95,23 @@ export default {
         case "BRPay":
           this.isActiveItem = 2;
           break;
-        case "Model":
-          this.isActiveItem = 3;
-          break;
+        // case "Model":
+        //   this.isActiveItem = 3;
+        //   break;
         case "BRAdd":
           this.isActiveItem = 4;
           break;
         case "BREmployes":
           this.isActiveItem = 4;
+          break;
+        case "BRSendingFinishedProduct":
+          this.isActiveItem = 5;
+          break;
+        case "BRSendingAddFinishedProduct":
+          this.isActiveItem = 5;
+          break;
+        case "BRReceptionProduct":
+          this.isActiveItem = 6;
           break;
       }
     },
@@ -346,10 +361,10 @@ export default {
     }
   }
   &__top {
-    width: 100vw;
-    display: flex;
-    justify-content: right;
-    align-items: center;
+    width: calc(100% - 210px);
+    // display: flex;
+    // justify-content: right;
+    // align-items: center;
     background: #002f34;
     margin-left: 210px;
     padding: 5px 15px;
@@ -357,6 +372,12 @@ export default {
     top: 0;
     right: 0;
     z-index: 98;
+    display: none;
+    // height: 36px;
+    cursor: pointer;
+    @media screen and (max-width: 991.5px) {
+      display: block;
+    }
     @media screen and (max-width: 991.5px) {
       margin-left: 0px;
       justify-content: space-between;

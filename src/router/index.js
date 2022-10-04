@@ -27,6 +27,10 @@ import BRPay from '@/views/Branches/BRPay.vue'
 import BRStore from '@/views/Branches/BRStore.vue'
 import BRAdd from '@/views/Branches/Add/BRAdd.vue'
 import BREmployes from '@/views/Branches/Add/BREmployes.vue'
+import BRSendingFinishedProduct from '@/views/Branches/Product/BRSendingFinishedProduct.vue'
+import BRSendingAddFinishedProduct from '@/views/Branches/Product/BRSendingAddFinishedProduct.vue'
+import BRReceptionProduct from '@/views/Branches/Product/BRReceptionProduct.vue'
+
 
 import Warehouse from '@/views/Warehouse/Warehouse.vue'
 import WRSending from '@/views/Warehouse/WRSending.vue'
@@ -229,6 +233,30 @@ const routes = [
     path: '/branch-employes',
     name: 'BREmployes',
     component: BREmployes,
+    meta: {
+      layout: 'BranchLayout'
+    }
+  },
+  {
+    path: '/branch-sending/finished-product',
+    name: 'BRSendingFinishedProduct',
+    component: BRSendingFinishedProduct,
+    meta: {
+      layout: 'BranchLayout'
+    }
+  },
+  {
+    path: '/branch-sending/finished-product/add',
+    name: 'BRSendingAddFinishedProduct',
+    component: BRSendingAddFinishedProduct,
+    meta: {
+      layout: 'BranchLayout'
+    }
+  },
+  {
+    path: '/branch-reception/product',
+    name: 'BRReceptionProduct',
+    component: BRReceptionProduct,
     meta: {
       layout: 'BranchLayout'
     }

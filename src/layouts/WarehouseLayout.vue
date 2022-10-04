@@ -32,13 +32,13 @@
       <div @click="openMenu()" class="btn-burger">
         <i class='bx bx-menu'></i>
       </div>
-      <div class="account">
+      <!-- <div class="account">
         <div class="account__text">
           <p class="account__title">Jakhongir</p>
           <p class="account__subtitle">Admin</p>
         </div>
         <img class="account__img" src="/img/account.png" alt="">
-      </div>
+      </div> -->
     </div>
   </div>
   <!-- MAIN CONTENT -->
