@@ -1,10 +1,10 @@
 <template>
-  <section class="WRSendingFinishedProduct">
+  <section class="sendingFinishedProduct">
     <div class="breadcrumb p-0">
-      <router-link :to="{name: 'Warehouse'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
+      <router-link :to="{name: 'Dashboard'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
-        <router-link :to="{name: 'WRSending'}" class="breadcrumb__link"><i class='bx bx-upload'></i></router-link>
+        <router-link :to="{name: 'Product', query: { name: 'Sending'}}" class="breadcrumb__link"><i class='bx bx-upload'></i></router-link>
       </div>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
@@ -50,7 +50,7 @@
               <div class="w-4 btns">
                 <button @click="openModalInfo(item)" type="button" class="btn btn-primary"><i class='bx bx-copy-alt'></i></button>
                 <!-- <button @click="changeModalAdd(item)" type="button" class="btn btn-warning"><i class='bx bx-edit'></i></button> -->
-                <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                <!-- <button @click="openModalDel(item.id)" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button> -->
               </div>
             </div>
           </div>
@@ -122,7 +122,7 @@ import Loading from '@/components/Loading.vue';
 // import moment from 'moment';
 
 export default {
-  name: 'WRSendingFinishedProduct',
+  name: 'SendingFinishedProduct',
   data() {
     return {
       loading: false,
@@ -149,14 +149,14 @@ export default {
   },
   mounted() {
     this.token = sessionStorage.getItem('token');
-    this.getListProductClaim();
+    this.listSendProducts();
   },
   methods: {
-    getListProductClaim() {
+    listSendProducts() {
       this.loading = true;
       this.info = [];
       this.infoSend = [];
-      axios.get(`${this.api}/listProductClaim/`, {
+      axios.get(`${this.api}/listSendProducts/`, {
           headers: {
             'Authorization': `Token ${this.token}`
           }
@@ -164,9 +164,9 @@ export default {
         .then(response => {
           for (let index = 0; index < response.data.length; index++) {
             if(response.data[index].recvState != 2) {
-              this.info.push(response.data[index]);
-            } else if(response.data[index].recvState == 2) {
               this.infoSend.push(response.data[index]);
+            } else if(response.data[index].recvState == 2) {
+              this.info.push(response.data[index]);
             }
           }
         })
@@ -330,7 +330,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.WRSendingFinishedProduct {
+.sendingFinishedProduct {
   @media screen and (max-width: 991.5px) {
     margin-left: 0;
     padding: 0px 10px;

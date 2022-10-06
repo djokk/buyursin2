@@ -1,23 +1,29 @@
 <template>
-  <section class="add">
+  <section class="product">
     <div class="breadcrumb p-0">
       <router-link :to="{name: 'Warehouse'}" class="breadcrumb__link"><i class="bx bx-home-alt"></i></router-link>
       <div class="breadcrumb__item">
         <i class="fa fa-angle-right"></i>
-        <p>{{ $t('Отправка') }}</p>
+        <p>{{ $route.query.name == 'Sending' ? $t('Отправка') : $route.query.name == 'Reception' ? $t('Прием') : '' }}</p>
       </div>
     </div>
-    <div class="wrapper">
+    <div v-if="$route.query.name == 'Sending'" class="wrapper">
       <div class="row">
         <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12">
-          <router-link :to="{name: 'WRSendingFinishedProduct'}" class="card-custom">
-            {{ $t('Готовый продук') }}
-          </router-link>
+          <router-link :to="{name: 'WRSendingFinishedProduct'}" class="card-custom">{{ $t('Готовый продук') }}</router-link>
         </div>
         <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12">
-          <router-link :to="{name: 'WRSendingProduct'}" class="card-custom">
-            {{ $t('Материал') }}
-          </router-link>
+          <router-link :to="{name: 'WRSendingProduct'}" class="card-custom">{{ $t('Материал') }}</router-link>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="$route.query.name == 'Reception'" class="wrapper">
+      <div class="row">
+        <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12">
+          <router-link :to="{name: 'WRReceptionFinishedProduct'}" class="card-custom">{{ $t('Готовый продук') }}</router-link>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12">
+          <router-link :to="{name: 'WRReceptionProduct'}" class="card-custom">{{ $t('Материал') }}</router-link>
         </div>
       </div>
     </div>
@@ -27,7 +33,7 @@
 <script>
 
 export default {
-  name: 'WRSending',
+  name: 'Product',
   data() {
     return {
     }
@@ -38,7 +44,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.add {
+.product {
   @media screen and (max-width: 991.5px) {
     margin-left: 0;
     padding: 0px 10px;

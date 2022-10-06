@@ -33,11 +33,11 @@ import BRReceptionProduct from '@/views/Branches/Product/BRReceptionProduct.vue'
 
 
 import Warehouse from '@/views/Warehouse/Warehouse.vue'
-import WRSending from '@/views/Warehouse/WRSending.vue'
+import WRProduct from '@/views/Warehouse/Product/WRProduct.vue'
 import WRSendingProduct from '@/views/Warehouse/Product/Sending/WRSendingProduct.vue'
+import WRSendingAddProduct from '@/views/Warehouse/Product/Sending/WRSendingAddProduct.vue'
 import WRSendingFinishedProduct from '@/views/Warehouse/Product/Sending/WRSendingFinishedProduct.vue'
 import WRSendingAddFinishedProduct from '@/views/Warehouse/Product/Sending/WRSendingAddFinishedProduct.vue'
-import WRReception from '@/views/Warehouse/WRReception.vue'
 import WRReceptionProduct from '@/views/Warehouse/Product/Reception/WRReceptionProduct.vue'
 import WRReceptionFinishedProduct from '@/views/Warehouse/Product/Reception/WRReceptionFinishedProduct.vue'
 // import NotFound from '@/views/NotFound.vue'
@@ -270,9 +270,9 @@ const routes = [
     }
   },
   {
-    path: '/wr-sending',
-    name: 'WRSending',
-    component: WRSending,
+    path: '/wr-product',
+    name: 'WRProduct',
+    component: WRProduct,
     meta: {
       layout: 'WarehouseLayout'
     }
@@ -281,6 +281,14 @@ const routes = [
     path: '/wr-sending/product',
     name: 'WRSendingProduct',
     component: WRSendingProduct,
+    meta: {
+      layout: 'WarehouseLayout'
+    }
+  },
+  {
+    path: '/wr-sending/product/add',
+    name: 'WRSendingAddProduct',
+    component: WRSendingAddProduct,
     meta: {
       layout: 'WarehouseLayout'
     }
@@ -302,9 +310,9 @@ const routes = [
     }
   },
   {
-    path: '/wr-reception',
-    name: 'WRReception',
-    component: WRReception,
+    path: '/wr-reception/finished-product',
+    name: 'WRReceptionFinishedProduct',
+    component: WRReceptionFinishedProduct,
     meta: {
       layout: 'WarehouseLayout'
     }
@@ -313,14 +321,6 @@ const routes = [
     path: '/wr-reception/product',
     name: 'WRReceptionProduct',
     component: WRReceptionProduct,
-    meta: {
-      layout: 'WarehouseLayout'
-    }
-  },
-  {
-    path: '/wr-reception/finished-product',
-    name: 'WRReceptionFinishedProduct',
-    component: WRReceptionFinishedProduct,
     meta: {
       layout: 'WarehouseLayout'
     }

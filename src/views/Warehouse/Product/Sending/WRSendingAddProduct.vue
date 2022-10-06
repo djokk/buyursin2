@@ -2,7 +2,7 @@
   <section class="SendingAddProduct">
     <div class="breadcrumb p-0">
       <div class="breadcrumb__item">
-        <router-link :to="{name: 'SendingProduct'}" class="breadcrumb__link">
+        <router-link :to="{name: 'WRSendingProduct'}" class="breadcrumb__link">
           <i class="fa fa-angle-left"></i>
           <p>{{ $t('back') }}</p>
         </router-link>

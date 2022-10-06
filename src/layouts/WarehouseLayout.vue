@@ -13,11 +13,11 @@
           <li class="menu__item" @click.prevent="isSidebarActiveItem(1)" :class="[isActiveItem == 1 ? 'active': '']">
             <router-link :to="{name: 'Warehouse'}" class="menu__link" href=""><i class='bx bxs-home'></i>{{ $t('store') }}</router-link>
           </li>
-          <li class="menu__item" @click.prevent="isSidebarActiveItem(2)" :class="[isActiveItem == 2 ? 'active': '']">
-            <router-link :to="{ name: 'WRSending'}" class="menu__link"><i class='bx bx-upload'></i>{{ $t('Отправка') }}</router-link>
+          <li class="menu__item" @click.prevent="isSidebarActiveItem(4)" :class="[isActiveItem == 4 ? 'active': '']">
+            <router-link :to="{ name: 'WRProduct', query: { name: 'Sending'} }" class="menu__link"><i class='bx bx-upload'></i>{{ $t('Отправка') }}</router-link>
           </li>
-          <li class="menu__item" @click.prevent="isSidebarActiveItem(3)" :class="[isActiveItem == 3 ? 'active': '']">
-            <router-link :to="{ name: 'WRReception'}" class="menu__link"><i class='bx bx-window-open'></i>{{ $t('Прием') }}</router-link>
+          <li class="menu__item" @click.prevent="isSidebarActiveItem(5)" :class="[isActiveItem == 5 ? 'active': '']">
+            <router-link :to="{ name: 'WRProduct', query: { name: 'Reception'} }" class="menu__link"><i class='bx bx-window-open'></i>{{ $t('Прием') }}</router-link>
           </li>
           <!-- <li class="menu__item" @click.prevent="isSidebarActiveItem(4)" :class="[isActiveItem == 4 ? 'active': '']">
             <router-link :to="{ name: 'BRAdd'}" class="menu__link"><i class='bx bxs-t-shirt'></i>{{ $t('add') }}</router-link>
@@ -86,20 +86,30 @@ export default {
         case "Warehouse":
           this.isActiveItem = 1;
           break;
-        case "WRSending":
-          this.isActiveItem = 2;
-          break;
-        case "WRSendingFinishedProduct":
-          this.isActiveItem = 2;
-          break;
-        case "WRSendingAddFinishedProduct":
-          this.isActiveItem = 2;
+          case "WRProduct":
+          if(this.$route.query.name == 'Sending') {
+            this.isActiveItem = 4;
+          } else if(this.$route.query.name == 'Reception') {
+            this.isActiveItem = 5;
+          }
           break;
         case "WRSendingProduct":
-          this.isActiveItem = 2;
+          this.isActiveItem = 4;
           break;
-        case "WRReception":
-          this.isActiveItem = 3;
+        case "WRSendingAddProduct":
+          this.isActiveItem = 4;
+          break;
+        case "WRSendingFinishedProduct":
+          this.isActiveItem = 4;
+          break;
+        case "WRSendingAddFinishedProduct":
+          this.isActiveItem = 4;
+          break;
+        case "WRReceptionFinishedProduct":
+          this.isActiveItem = 5;
+          break;
+        case "WRReceptionProduct":
+          this.isActiveItem = 5;
           break;
       }
     },
@@ -349,20 +359,28 @@ export default {
     }
   }
   &__top {
-    width: 100vw;
-    display: flex;
-    justify-content: right;
-    align-items: center;
+    // width: calc(100vw - 220px);
+    width: calc(100% - 210px);
+    // display: flex;
+    // justify-content: right;
+    // align-items: center;
     background: #002f34;
     margin-left: 210px;
     padding: 5px 15px;
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0px;
     z-index: 98;
+    display: none;
+    // height: 36px;
+    cursor: pointer;
     @media screen and (max-width: 991.5px) {
-      margin-left: 0px;
+      display: block;
+    }
+    @media screen and (max-width: 991.5px) {
+      width: 100%;
       justify-content: space-between;
+      margin-left: 0px;
     }
     .btn-burger {
       display: none;
